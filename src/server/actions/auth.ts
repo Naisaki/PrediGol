@@ -6,7 +6,7 @@
 
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
 const loginSchema = z.object({
@@ -116,8 +116,10 @@ export async function registerAction(
     return { success: false, error: 'Error al crear cuenta. Intenta de nuevo.' };
   }
 
-  // Crear perfil
-  const { error: profileError } = await supabase.from('profiles').insert({
+  // Crear perfil usando cliente de servicio (service role) para evitar problemas de RLS 
+  // antes de que la sesión del usuario esté completamente activa o si requiere verificación por correo.
+  const serviceClient = createServiceClient();
+  const { error: profileError } = await serviceClient.from('profiles').insert({
     user_id: authData.user.id,
     username: username.toLowerCase(),
     full_name: fullName ?? null,
