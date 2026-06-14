@@ -1,0 +1,309 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   MUNDIAL PREDICTOR — Design System
+   Tema oscuro deportivo premium
+   ============================================================ */
+
+:root {
+  /* -- Colores base -- */
+  --background: 222 47% 5%;
+  --foreground: 210 40% 96%;
+
+  /* -- Cards y superficies -- */
+  --card: 222 40% 8%;
+  --card-foreground: 210 40% 96%;
+  --popover: 222 40% 8%;
+  --popover-foreground: 210 40% 96%;
+
+  /* -- Primario: Verde fútbol -- */
+  --primary: 142 72% 44%;
+  --primary-foreground: 0 0% 100%;
+
+  /* -- Secundario: Dorado trofeo -- */
+  --secondary: 43 96% 56%;
+  --secondary-foreground: 222 47% 5%;
+
+  /* -- Muted -- */
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+
+  /* -- Acento azul -- */
+  --accent: 221 83% 62%;
+  --accent-foreground: 0 0% 100%;
+
+  /* -- Destructivo -- */
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  /* -- Bordes e inputs -- */
+  --border: 217 33% 20%;
+  --input: 217 33% 14%;
+  --ring: 142 72% 44%;
+
+  /* -- Radius -- */
+  --radius: 0.75rem;
+
+  /* -- Colores de estado de partido -- */
+  --status-scheduled: 215 20% 65%;
+  --status-live: 142 72% 44%;
+  --status-finished: 43 96% 56%;
+  --status-postponed: 0 72% 51%;
+
+  /* -- Glassmorphism -- */
+  --glass-bg: rgba(15, 20, 40, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================================
+   Base Styles
+   ============================================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-feature-settings: 'rlig' 1, 'calt' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================
+   Gradientes y efectos
+   ============================================================ */
+
+.gradient-primary {
+  background: linear-gradient(135deg, hsl(142 72% 44%) 0%, hsl(162 72% 36%) 100%);
+}
+
+.gradient-hero {
+  background: 
+    radial-gradient(ellipse at 20% 50%, hsl(142 72% 20% / 0.3) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, hsl(221 83% 30% / 0.2) 0%, transparent 50%),
+    hsl(var(--background));
+}
+
+.gradient-card {
+  background: linear-gradient(
+    135deg,
+    hsl(222 40% 10%) 0%,
+    hsl(222 40% 8%) 100%
+  );
+}
+
+/* ============================================================
+   Glassmorphism
+   ============================================================ */
+
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-card {
+  background: rgba(20, 26, 50, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* ============================================================
+   Match Status Badges
+   ============================================================ */
+
+.badge-scheduled {
+  background: hsl(217 33% 17%);
+  color: hsl(215 20% 65%);
+  border: 1px solid hsl(217 33% 25%);
+}
+
+.badge-live {
+  background: hsl(142 72% 15%);
+  color: hsl(142 72% 60%);
+  border: 1px solid hsl(142 72% 30%);
+  animation: pulse-live 2s infinite;
+}
+
+.badge-finished {
+  background: hsl(43 96% 10%);
+  color: hsl(43 96% 56%);
+  border: 1px solid hsl(43 96% 25%);
+}
+
+.badge-postponed {
+  background: hsl(0 72% 10%);
+  color: hsl(0 72% 60%);
+  border: 1px solid hsl(0 72% 25%);
+}
+
+/* ============================================================
+   Animaciones
+   ============================================================ */
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+/* ============================================================
+   Componentes customizados
+   ============================================================ */
+
+/* Score inputs para pronósticos */
+.score-input {
+  width: 3.5rem;
+  height: 3.5rem;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border-radius: 0.5rem;
+  border: 2px solid hsl(var(--border));
+  background: hsl(var(--input));
+  color: hsl(var(--foreground));
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.score-input:focus {
+  outline: none;
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.2);
+}
+
+.score-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Ranking table rows */
+.ranking-row-1 {
+  border-left: 3px solid hsl(43 96% 56%);
+}
+.ranking-row-2 {
+  border-left: 3px solid hsl(215 20% 70%);
+}
+.ranking-row-3 {
+  border-left: 3px solid hsl(25 80% 55%);
+}
+
+/* Team flag images */
+.team-flag {
+  width: 2rem;
+  height: 1.5rem;
+  object-fit: cover;
+  border-radius: 2px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+/* Bracket connectors */
+.bracket-connector {
+  border-color: hsl(var(--border));
+}
+
+/* ============================================================
+   Scrollbar personalizado
+   ============================================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
+/* ============================================================
+   Mobile bottom nav safe area
+   ============================================================ */
+
+.mobile-nav-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ============================================================
+   Shadcn/ui overrides para tema oscuro personalizado
+   ============================================================ */
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
