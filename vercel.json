@@ -2,8 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/sync-fixtures",
-      "schedule": "0 2 * * *",
-      "comment": "Sync complete fixture once per day at 02:00 UTC"
+      "schedule": "0 2 * * *"
     }
   ],
   "headers": [
