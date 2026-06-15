@@ -2,21 +2,49 @@
 
 import { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, Clock } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import { LocalTime } from '@/components/common/local-time';
 import { cn } from '@/lib/utils/cn';
-import type { Match } from '@/types/app.types';
+
+interface DbMatch {
+  id: string;
+  external_api_id: number;
+  competition_code: string;
+  competition_name: string | null;
+  season_year: number | null;
+  utc_date: string;
+  kickoff_time: string;
+  status: string;
+  matchday: number | null;
+  stage: string | null;
+  group_name: string | null;
+  home_team_id: string | null;
+  away_team_id: string | null;
+  home_team_name: string | null;
+  away_team_name: string | null;
+  home_team_crest: string | null;
+  away_team_crest: string | null;
+  home_score: number | null;
+  away_score: number | null;
+  winner: string | null;
+  duration: string | null;
+  last_updated_from_api: string | null;
+  manually_updated: boolean;
+  created_at: string;
+  updated_at: string;
+}
 
 interface MatchesCalendarProps {
-  initialMatches: Match[];
+  initialMatches: DbMatch[];
 }
 
 export function MatchesCalendar({ initialMatches }: MatchesCalendarProps) {
   // 1. Agrupar partidos por fecha (YYYY-MM-DD)
   const matchesByDate = useMemo(() => {
-    const groups: Record<string, Match[]> = {};
+    const groups: Record<string, DbMatch[]> = {};
     initialMatches.forEach((match) => {
-      const dateStr = new Date(match.kickoffTime).toISOString().split('T')[0];
+      if (!match.kickoff_time) return;
+      const dateStr = new Date(match.kickoff_time).toISOString().split('T')[0];
       if (!groups[dateStr]) {
         groups[dateStr] = [];
       }
@@ -161,7 +189,7 @@ export function MatchesCalendar({ initialMatches }: MatchesCalendarProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {activeMatches.map((match) => {
             const config = statusConfig[match.status] ?? statusConfig.scheduled;
-            const hasScore = match.homeScore !== null && match.awayScore !== null;
+            const hasScore = match.home_score !== null && match.away_score !== null;
 
             return (
               <Card
@@ -187,16 +215,16 @@ export function MatchesCalendar({ initialMatches }: MatchesCalendarProps) {
                   <div className="flex items-center justify-between gap-4 py-2">
                     {/* Home Team */}
                     <div className="flex-1 flex items-center gap-3 min-w-0">
-                      {match.homeTeamCrest && (
+                      {match.home_team_crest && (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                          src={match.homeTeamCrest}
-                          alt={match.homeTeamName ?? ''}
+                          src={match.home_team_crest}
+                          alt={match.home_team_name ?? ''}
                           className="team-flag w-7 h-5 flex-shrink-0"
                         />
                       )}
                       <span className={cn('font-semibold text-sm truncate', match.winner === 'home' && 'text-primary')}>
-                        {match.homeTeamName ?? 'Por definir'}
+                        {match.home_team_name ?? 'Por definir'}
                       </span>
                     </div>
 
@@ -205,16 +233,16 @@ export function MatchesCalendar({ initialMatches }: MatchesCalendarProps) {
                       {hasScore ? (
                         <div className="flex items-center gap-1.5 text-base font-black">
                           <span className={match.winner === 'home' ? 'text-primary' : ''}>
-                            {match.homeScore}
+                            {match.home_score}
                           </span>
                           <span className="text-muted-foreground/60 text-xs">-</span>
                           <span className={match.winner === 'away' ? 'text-primary' : ''}>
-                            {match.awayScore}
+                            {match.away_score}
                           </span>
                         </div>
                       ) : (
                         <div className="text-xs font-bold text-muted-foreground">
-                          <LocalTime utcDate={match.kickoffTime} />
+                          <LocalTime utcDate={match.kickoff_time} />
                         </div>
                       )}
                     </div>
@@ -222,13 +250,13 @@ export function MatchesCalendar({ initialMatches }: MatchesCalendarProps) {
                     {/* Away Team */}
                     <div className="flex-1 flex items-center justify-end gap-3 min-w-0 text-right">
                       <span className={cn('font-semibold text-sm truncate', match.winner === 'away' && 'text-primary')}>
-                        {match.awayTeamName ?? 'Por definir'}
+                        {match.away_team_name ?? 'Por definir'}
                       </span>
-                      {match.awayTeamCrest && (
+                      {match.away_team_crest && (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                          src={match.awayTeamCrest}
-                          alt={match.awayTeamName ?? ''}
+                          src={match.away_team_crest}
+                          alt={match.away_team_name ?? ''}
                           className="team-flag w-7 h-5 flex-shrink-0"
                         />
                       )}

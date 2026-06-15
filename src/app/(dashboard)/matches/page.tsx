@@ -44,7 +44,7 @@ export default async function MatchesPage() {
           </pre>
         </div>
       ) : (
-        <MatchesCalendar initialMatches={matches} />
+        <MatchesCalendar initialMatches={matches as any} />
       )}
     </div>
   );

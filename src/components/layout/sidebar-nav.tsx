@@ -54,7 +54,9 @@ export function SidebarNav({ username, avatarUrl }: SidebarNavProps) {
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
-            (item.href !== '/dashboard' && pathname.startsWith(item.href));
+            (item.href !== '/dashboard' &&
+              item.href !== '/matches' &&
+              pathname.startsWith(item.href));
 
           return (
             <Link
