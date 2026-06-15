@@ -23,7 +23,7 @@ export default async function TodayMatchesPage() {
   const endOfDay = new Date(today);
   endOfDay.setHours(23, 59, 59, 999);
 
-  const { data: matches } = await supabase
+  const { data: matches, error: matchesError } = await supabase
     .from('matches')
     .select('*')
     .gte('kickoff_time', startOfDay.toISOString())
@@ -31,13 +31,25 @@ export default async function TodayMatchesPage() {
     .order('kickoff_time', { ascending: true });
 
   // Obtener última sincronización
-  const { data: syncLogs } = await supabase
+  const { data: syncLogs, error: syncError } = await supabase
     .from('sync_logs')
     .select('completed_at')
     .eq('sync_type', 'today_matches')
     .eq('status', 'success')
     .order('completed_at', { ascending: false })
     .limit(1);
+
+  if (matchesError || syncError) {
+    return (
+      <div className="p-6 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg space-y-2">
+        <h2 className="font-bold text-lg">Error de Base de Datos</h2>
+        <p className="text-sm">No se pudo cargar la información de partidos hoy.</p>
+        <pre className="text-xs font-mono bg-background/50 p-3 rounded overflow-auto">
+          {JSON.stringify({ matchesError, syncError }, null, 2)}
+        </pre>
+      </div>
+    );
+  }
 
   const lastSync = syncLogs && syncLogs.length > 0 ? syncLogs[0] : null;
 
