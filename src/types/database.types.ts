@@ -210,6 +210,7 @@ export type Database = {
           manually_updated_at: string | null;
           created_at: string;
           updated_at: string;
+          stream_url: string | null;
         };
         Insert: {
           id?: string;
@@ -242,6 +243,7 @@ export type Database = {
           manually_updated_at?: string | null;
           created_at?: string;
           updated_at?: string;
+          stream_url?: string | null;
         };
         Update: {
           status?: string;
@@ -261,6 +263,7 @@ export type Database = {
           stage?: string | null;
           group_name?: string | null;
           updated_at?: string;
+          stream_url?: string | null;
         };
       };
       predictions: {

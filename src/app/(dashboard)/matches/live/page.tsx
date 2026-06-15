@@ -8,6 +8,7 @@ import { Radio, Clock, RefreshCw } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ApiDelayNotice } from '@/components/common/api-delay-notice';
 import { LocalTime } from '@/components/common/local-time';
+import { StreamPlayerModal } from '@/components/matches/stream-player-modal';
 import { cn } from '@/lib/utils/cn';
 import type { Metadata } from 'next';
 
@@ -20,7 +21,7 @@ export default async function LiveMatchesPage() {
   // Obtener solo partidos en juego (in_play) o descanso (paused)
   const { data: matches, error: matchesError } = await supabase
     .from('matches')
-    .select('*')
+    .select('id, home_team_name, away_team_name, home_team_crest, away_team_crest, kickoff_time, status, home_score, away_score, winner, group_name, stage, last_updated_from_api, manually_updated, stream_url')
     .in('status', ['in_play', 'paused'])
     .order('kickoff_time', { ascending: true });
 
@@ -96,7 +97,7 @@ export default async function LiveMatchesPage() {
       ) : (
         <div className="space-y-4">
           {matches.map((match) => (
-            <MatchStatusCard key={match.id} match={match} />
+            <MatchStatusCard key={match.id} match={match as any} />
           ))}
         </div>
       )}
@@ -122,6 +123,7 @@ interface MatchStatusCardProps {
     stage: string | null;
     last_updated_from_api: string | null;
     manually_updated: boolean;
+    stream_url: string | null;
   };
 }
 
@@ -227,6 +229,13 @@ function MatchStatusCard({ match }: MatchStatusCardProps) {
             </span>
           </div>
         </div>
+
+        {/* Stream player premium trigger */}
+        <StreamPlayerModal
+          streamUrl={match.stream_url}
+          homeTeam={match.home_team_name ?? 'Por definir'}
+          awayTeam={match.away_team_name ?? 'Por definir'}
+        />
 
         {/* Footer */}
         {(match.last_updated_from_api || match.manually_updated) && (
