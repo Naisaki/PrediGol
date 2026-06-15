@@ -6,6 +6,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { getGroupMembers } from '@/server/services/group.service';
 import { upsertPrediction } from '@/server/services/prediction.service';
 import { z } from 'zod';
 
@@ -56,14 +57,10 @@ export async function savePredictionAction(
   if (!user) return { success: false, error: 'Debes iniciar sesión.' };
 
   // Verificar que el usuario sea miembro del grupo
-  const { data: membership } = await supabase
-    .from('group_members')
-    .select('id')
-    .eq('group_id', groupId)
-    .eq('user_id', user.id)
-    .single();
+  const members = await getGroupMembers(groupId);
+  const currentMember = members.find((m) => m.userId === user.id);
 
-  if (!membership) {
+  if (!currentMember) {
     return {
       success: false,
       error: 'No eres miembro de este grupo.',
