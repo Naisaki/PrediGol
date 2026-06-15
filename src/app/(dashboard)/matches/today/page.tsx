@@ -31,14 +31,15 @@ export default async function TodayMatchesPage() {
     .order('kickoff_time', { ascending: true });
 
   // Obtener última sincronización
-  const { data: lastSync } = await supabase
+  const { data: syncLogs } = await supabase
     .from('sync_logs')
     .select('completed_at')
     .eq('sync_type', 'today_matches')
     .eq('status', 'success')
     .order('completed_at', { ascending: false })
-    .limit(1)
-    .single();
+    .limit(1);
+
+  const lastSync = syncLogs && syncLogs.length > 0 ? syncLogs[0] : null;
 
   const lastSyncTime = lastSync?.completed_at
     ? new Date(lastSync.completed_at).toLocaleTimeString('es', {

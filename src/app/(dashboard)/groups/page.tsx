@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { Plus, Users, Hash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { JoinGroupForm } from '@/components/groups/join-group-form';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = { title: 'Mis Grupos' };
@@ -56,17 +56,7 @@ export default async function GroupsPage() {
       {/* Join by code */}
       <Card className="glass-card border-border/40">
         <CardContent className="p-4">
-          <div className="flex gap-3">
-            <div className="relative flex-1">
-              <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Ingresa un código de invitación..."
-                className="pl-9 bg-input border-border/60"
-                id="join-code-input"
-              />
-            </div>
-            <JoinByCodeButton />
-          </div>
+          <JoinGroupForm />
         </CardContent>
       </Card>
 
@@ -138,17 +128,4 @@ export default async function GroupsPage() {
   );
 }
 
-// Client component for join form
-function JoinByCodeButton() {
-  return (
-    <Button
-      variant="outline"
-      className="border-border/60 shrink-0"
-      onClick={() => {
-        // Handled client-side in a separate component
-      }}
-    >
-      Unirme
-    </Button>
-  );
-}
+

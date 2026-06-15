@@ -28,7 +28,7 @@ export default async function DashboardLayout({
     .from('profiles')
     .select('username, full_name, avatar_url')
     .eq('user_id', user.id)
-    .single();
+    .maybeSingle();
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

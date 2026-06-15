@@ -34,7 +34,7 @@ export default async function DashboardPage() {
     .from('profiles')
     .select('username, full_name')
     .eq('user_id', user.id)
-    .single();
+    .maybeSingle();
 
   // Grupos del usuario
   const { data: memberships } = await supabase
