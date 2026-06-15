@@ -25,13 +25,16 @@ interface ChannelOption {
 
 // Canales preconfigurados extraídos dinámicamente de tvtvhd.com
 const DEFAULT_CHANNELS: ChannelOption[] = [
-  { name: 'DIRECTV Sports (DSPORTS)', url: 'https://tvtvhd.com/embed/directv-sports.html', provider: 'tvtvhd.com' },
-  { name: 'ESPN', url: 'https://tvtvhd.com/embed/espn.html', provider: 'tvtvhd.com' },
-  { name: 'ESPN 2', url: 'https://tvtvhd.com/embed/espn2.html', provider: 'tvtvhd.com' },
-  { name: 'ESPN 3', url: 'https://tvtvhd.com/embed/espn3.html', provider: 'tvtvhd.com' },
-  { name: 'Fox Sports', url: 'https://tvtvhd.com/embed/fox-sports.html', provider: 'tvtvhd.com' },
-  { name: 'Fox Sports 2', url: 'https://tvtvhd.com/embed/fox-sports-2.html', provider: 'tvtvhd.com' },
-  { name: 'TyC Sports', url: 'https://tvtvhd.com/embed/tyc-sports.html', provider: 'tvtvhd.com' },
+  { name: 'ESPN', url: 'https://tvtvhd.com/vivo/canales.php?stream=espn', provider: 'tvtvhd.com' },
+  { name: 'ESPN 2', url: 'https://tvtvhd.com/vivo/canales.php?stream=espn2', provider: 'tvtvhd.com' },
+  { name: 'ESPN 3', url: 'https://tvtvhd.com/vivo/canales.php?stream=espn3', provider: 'tvtvhd.com' },
+  { name: 'ESPN Premium', url: 'https://tvtvhd.com/vivo/canales.php?stream=espnpremium', provider: 'tvtvhd.com' },
+  { name: 'DIRECTV Sports (DSPORTS)', url: 'https://tvtvhd.com/vivo/canales.php?stream=dsports', provider: 'tvtvhd.com' },
+  { name: 'Fox Sports', url: 'https://tvtvhd.com/vivo/canales.php?stream=foxsports', provider: 'tvtvhd.com' },
+  { name: 'Fox Sports 2', url: 'https://tvtvhd.com/vivo/canales.php?stream=foxsports2', provider: 'tvtvhd.com' },
+  { name: 'Fox Sports 3', url: 'https://tvtvhd.com/vivo/canales.php?stream=foxsports3', provider: 'tvtvhd.com' },
+  { name: 'TyC Sports', url: 'https://tvtvhd.com/vivo/canales.php?stream=tycsports', provider: 'tvtvhd.com' },
+  { name: 'Liga1 MAX', url: 'https://tvtvhd.com/vivo/canales.php?stream=liga1max', provider: 'tvtvhd.com' },
 ];
 
 export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlayerModalProps) {
@@ -77,40 +80,54 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
               </DialogDescription>
             </div>
 
-            {/* Selector de Canales Estilizado */}
-            <div className="relative z-50">
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-border/30 text-xs font-semibold text-foreground hover:bg-slate-750 transition-colors"
-              >
-                <span>Cambiar de canal</span>
-                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
-              </button>
+            {/* Controles y Selector */}
+            <div className="flex items-center gap-2 z-50">
+              {/* Selector de Canales Estilizado */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowDropdown(!showDropdown)}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-border/30 text-xs font-semibold text-foreground hover:bg-slate-750 transition-colors"
+                >
+                  <span>Cambiar de canal</span>
+                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+                </button>
 
-              {showDropdown && (
-                <div className="absolute right-0 mt-1.5 w-56 rounded-xl bg-slate-900 border border-border/40 shadow-xl overflow-hidden py-1">
-                  <div className="px-3 py-1 text-[10px] font-bold text-muted-foreground uppercase border-b border-border/20 mb-1">
-                    Señales Disponibles
+                {showDropdown && (
+                  <div className="absolute right-0 mt-1.5 w-56 rounded-xl bg-slate-900 border border-border/40 shadow-xl overflow-hidden py-1">
+                    <div className="px-3 py-1 text-[10px] font-bold text-muted-foreground uppercase border-b border-border/20 mb-1">
+                      Señales Disponibles
+                    </div>
+                    {channelsList.map((ch, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          setActiveChannel(ch);
+                          setShowDropdown(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 text-xs transition-colors flex flex-col ${
+                          activeChannel.url === ch.url 
+                            ? 'bg-primary/10 text-primary font-semibold' 
+                            : 'text-muted-foreground hover:bg-slate-800 hover:text-foreground'
+                        }`}
+                      >
+                        <span>{ch.name}</span>
+                        <span className="text-[9px] text-muted-foreground/50 font-normal">vía {ch.provider}</span>
+                      </button>
+                    ))}
                   </div>
-                  {channelsList.map((ch, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => {
-                        setActiveChannel(ch);
-                        setShowDropdown(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 text-xs transition-colors flex flex-col ${
-                        activeChannel.url === ch.url 
-                          ? 'bg-primary/10 text-primary font-semibold' 
-                          : 'text-muted-foreground hover:bg-slate-800 hover:text-foreground'
-                      }`}
-                    >
-                      <span>{ch.name}</span>
-                      <span className="text-[9px] text-muted-foreground/50 font-normal">vía {ch.provider}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
+                )}
+              </div>
+
+              {/* Botón Externo de Respaldo */}
+              <a
+                href={activeChannel.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/20 border border-primary/30 text-xs font-semibold text-primary hover:bg-primary/35 transition-colors"
+              >
+                <Tv className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Ver señal externa</span>
+              </a>
             </div>
 
             <Button
@@ -133,7 +150,7 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
               className="absolute inset-0 w-full h-full border-none"
               allow="autoplay; encrypted-media; picture-in-picture"
               allowFullScreen
-              sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
+              sandbox="allow-scripts allow-same-origin allow-presentation allow-forms allow-popups allow-popups-to-escape-sandbox"
             />
             
             {/* Aviso flotante de seguridad */}
