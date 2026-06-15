@@ -1,34 +1,27 @@
 // =============================================================
-// app/(dashboard)/matches/today/page.tsx
-// Partidos de hoy / Estado de partidos
+// app/(dashboard)/matches/live/page.tsx
+// Partidos En Vivo (Estado in_play o paused)
 // =============================================================
 
 import { createClient } from '@/lib/supabase/server';
-import { Calendar, Clock, RefreshCw } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Radio, Clock, RefreshCw } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { ApiDelayNotice } from '@/components/common/api-delay-notice';
 import { LocalTime } from '@/components/common/local-time';
 import { cn } from '@/lib/utils/cn';
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = { title: 'Partidos de Hoy' };
-export const revalidate = 60; // Revalidar cada minuto
+export const metadata: Metadata = { title: 'Partidos En Vivo' };
+export const revalidate = 10; // Revalidar cada 10 segundos en vivo
 
-export default async function TodayMatchesPage() {
+export default async function LiveMatchesPage() {
   const supabase = await createClient();
 
-  const today = new Date();
-  const startOfDay = new Date(today);
-  startOfDay.setHours(0, 0, 0, 0);
-  const endOfDay = new Date(today);
-  endOfDay.setHours(23, 59, 59, 999);
-
+  // Obtener solo partidos en juego (in_play) o descanso (paused)
   const { data: matches, error: matchesError } = await supabase
     .from('matches')
     .select('*')
-    .gte('kickoff_time', startOfDay.toISOString())
-    .lte('kickoff_time', endOfDay.toISOString())
+    .in('status', ['in_play', 'paused'])
     .order('kickoff_time', { ascending: true });
 
   // Obtener última sincronización
@@ -44,7 +37,7 @@ export default async function TodayMatchesPage() {
     return (
       <div className="p-6 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg space-y-2">
         <h2 className="font-bold text-lg">Error de Base de Datos</h2>
-        <p className="text-sm">No se pudo cargar la información de partidos hoy.</p>
+        <p className="text-sm">No se pudo cargar la información de partidos en vivo.</p>
         <pre className="text-xs font-mono bg-background/50 p-3 rounded overflow-auto">
           {JSON.stringify({ matchesError, syncError }, null, 2)}
         </pre>
@@ -67,21 +60,19 @@ export default async function TodayMatchesPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Calendar className="h-6 w-6 text-primary" />
-            Partidos de Hoy
+            <span className="relative flex h-3 w-3 mr-1">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
+            Partidos En Vivo
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
-            {today.toLocaleDateString('es', {
-              weekday: 'long',
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
-            })}
+            Resultados y estado de los partidos en tiempo real
           </p>
         </div>
         {lastSyncTime && (
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <RefreshCw className="h-3 w-3" />
+            <RefreshCw className="h-3 w-3 animate-spin-slow" />
             Actualizado {lastSyncTime}
           </div>
         )}
@@ -93,12 +84,12 @@ export default async function TodayMatchesPage() {
       {!matches || matches.length === 0 ? (
         <Card className="glass-card border-border/40">
           <CardContent className="text-center py-16">
-            <Calendar className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
+            <Radio className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
             <p className="text-muted-foreground font-medium mb-1">
-              No hay partidos programados para hoy
+              No hay partidos jugándose en este momento
             </p>
             <p className="text-xs text-muted-foreground/60">
-              Los datos se actualizan automáticamente
+              Cuando inicien los partidos programados para hoy, los verás listados aquí en vivo.
             </p>
           </CardContent>
         </Card>
@@ -155,9 +146,7 @@ function MatchStatusCard({ match }: MatchStatusCardProps) {
   return (
     <Card
       className={cn(
-        'glass-card border-border/40 transition-all',
-        isLive && 'border-primary/30 shadow-lg shadow-primary/5',
-        isFinished && 'border-secondary/20',
+        'glass-card border-border/40 transition-all border-primary/30 shadow-lg shadow-primary/5',
       )}
     >
       <CardContent className="p-5">
@@ -172,7 +161,7 @@ function MatchStatusCard({ match }: MatchStatusCardProps) {
               <span>· Grupo {match.group_name.replace('GROUP_', '')}</span>
             )}
           </div>
-          <span className={cn('text-xs px-2 py-0.5 rounded-full border font-medium', config.className)}>
+          <span className={cn('text-xs px-2 py-0.5 rounded-full border font-medium animate-pulse', config.className)}>
             {config.label}
           </span>
         </div>

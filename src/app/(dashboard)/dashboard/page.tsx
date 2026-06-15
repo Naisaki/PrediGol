@@ -89,7 +89,7 @@ export default async function DashboardPage() {
             label: 'Partidos hoy',
             value: todayMatches?.length ?? 0,
             icon: Calendar,
-            href: '/matches/today',
+            href: '/matches',
             color: 'text-secondary',
           },
           {
@@ -182,7 +182,7 @@ export default async function DashboardPage() {
             <CardTitle className="text-base font-semibold">
               Partidos de Hoy
             </CardTitle>
-            <Link href="/matches/today">
+            <Link href="/matches">
               <Button variant="ghost" size="sm" className="text-xs text-muted-foreground h-7">
                 Ver todos
                 <ChevronRight className="ml-1 h-3 w-3" />
