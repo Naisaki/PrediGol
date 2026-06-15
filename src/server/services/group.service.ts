@@ -102,7 +102,10 @@ export async function getUserGroups(userId: string): Promise<Group[]> {
     .select(`
       role,
       joined_at,
-      group:groups (*)
+      group:groups (
+        *,
+        members:group_members(count)
+      )
     `)
     .eq('user_id', userId)
     .order('joined_at', { ascending: false });
@@ -114,6 +117,9 @@ export async function getUserGroups(userId: string): Promise<Group[]> {
     .map((row) => {
       const g = mapGroupRow(row.group);
       g.currentUserRole = row.role;
+      // Extraemos el conteo de la respuesta agregada de Supabase
+      const countData = row.group.members;
+      g.memberCount = Array.isArray(countData) && countData[0] ? countData[0].count : 0;
       return g;
     });
 }

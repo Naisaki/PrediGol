@@ -71,32 +71,89 @@ export default async function GroupsPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {groups.map((g) => {
+            // Generar iniciales del nombre del grupo
+            const initials = g.name
+              .split(' ')
+              .map((word) => word[0])
+              .join('')
+              .substring(0, 2)
+              .toUpperCase();
+
+            // Estilos específicos para la insignia del rol
+            const roleBadgeStyles = {
+              owner: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
+              admin: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
+              member: 'bg-slate-500/10 text-slate-400 border border-slate-500/20',
+            }[g.currentUserRole || 'member'];
+
             return (
               <Link key={g.id} href={`/groups/${g.id}`}>
-                <Card className="glass-card border-border/40 hover:border-primary/30 transition-all hover:shadow-lg hover:shadow-primary/5 cursor-pointer h-full group">
-                  <CardContent className="p-5">
+                <Card className="glass-card border-border/40 hover:border-primary/30 hover:-translate-y-1 transition-all hover:shadow-lg hover:shadow-primary/5 cursor-pointer h-full group flex flex-col justify-between">
+                  <CardContent className="p-5 flex flex-col h-full">
+                    {/* Header: Avatar / Image & Role */}
                     <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
-                        <Users className="h-6 w-6 text-primary" />
-                      </div>
-                      <span className="text-xs px-2 py-1 rounded-full bg-muted/60 text-muted-foreground capitalize">
-                        {g.currentUserRole}
+                      {g.imageUrl ? (
+                        <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-border/60">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={g.imageUrl}
+                            alt={g.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/30 to-violet-500/30 border border-primary/20 flex items-center justify-center font-bold text-sm text-primary tracking-wider">
+                          {initials}
+                        </div>
+                      )}
+                      <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${roleBadgeStyles}`}>
+                        {g.currentUserRole === 'owner' ? 'Owner' : g.currentUserRole === 'admin' ? 'Admin' : 'Miembro'}
                       </span>
                     </div>
 
-                    <h3 className="font-semibold text-base mb-1 line-clamp-1">
-                      {g.name}
-                    </h3>
+                    {/* Body: Title and description */}
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-base mb-1 line-clamp-1 group-hover:text-primary transition-colors">
+                        {g.name}
+                      </h3>
 
-                    {g.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                        {g.description}
-                      </p>
-                    )}
+                      {g.description ? (
+                        <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+                          {g.description}
+                        </p>
+                      ) : (
+                        <p className="text-sm text-muted-foreground/50 italic mb-4">
+                          Sin descripción
+                        </p>
+                      )}
+                    </div>
 
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-auto">
-                      <Hash className="h-3 w-3" />
-                      <span className="font-mono tracking-widest">{g.inviteCode}</span>
+                    {/* Footer: Stats, Code, Admission Lock status */}
+                    <div className="pt-3 border-t border-border/20 flex items-center justify-between text-xs text-muted-foreground mt-auto gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <Users className="h-3.5 w-3.5 text-muted-foreground/75" />
+                        <span>
+                          {g.memberCount ?? 1}
+                          {g.maxMembers ? ` / ${g.maxMembers}` : ''}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {g.joinsOpen === false ? (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium">
+                            🔒 Cerrado
+                          </span>
+                        ) : g.joinApproval ? (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-medium">
+                            ⏳ Con Aprobación
+                          </span>
+                        ) : (
+                          <div className="flex items-center gap-1">
+                            <Hash className="h-3 w-3" />
+                            <span className="font-mono tracking-wider font-semibold">{g.inviteCode}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
