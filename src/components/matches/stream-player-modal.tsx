@@ -63,7 +63,7 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-4xl bg-slate-950 border-border/40 p-0 overflow-hidden shadow-2xl rounded-2xl">
+        <DialogContent className="sm:max-w-4xl w-full bg-slate-950 border-border/40 p-0 overflow-hidden shadow-2xl rounded-2xl">
           {/* Header */}
           <DialogHeader className="p-4 bg-slate-900 border-b border-border/20 flex flex-row items-center justify-between gap-4">
             <div className="flex-1 min-w-0">
@@ -144,7 +144,7 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
           </DialogHeader>
 
           {/* Reproductor / Iframe */}
-          <div className="relative aspect-video w-full bg-black flex flex-col items-center justify-center p-4">
+          <div className="relative aspect-video w-full bg-black">
             <iframe
               src={activeChannel.url}
               className="absolute inset-0 w-full h-full border-none"
