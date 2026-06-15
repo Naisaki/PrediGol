@@ -25,16 +25,16 @@ interface ChannelOption {
 
 // Canales preconfigurados extraídos dinámicamente de tvtvhd.com
 const DEFAULT_CHANNELS: ChannelOption[] = [
-  { name: 'ESPN', url: 'https://tvtvhd.com/vivo/canales.php?stream=espn', provider: 'tvtvhd.com' },
-  { name: 'ESPN 2', url: 'https://tvtvhd.com/vivo/canales.php?stream=espn2', provider: 'tvtvhd.com' },
-  { name: 'ESPN 3', url: 'https://tvtvhd.com/vivo/canales.php?stream=espn3', provider: 'tvtvhd.com' },
-  { name: 'ESPN Premium', url: 'https://tvtvhd.com/vivo/canales.php?stream=espnpremium', provider: 'tvtvhd.com' },
-  { name: 'DIRECTV Sports (DSPORTS)', url: 'https://tvtvhd.com/vivo/canales.php?stream=dsports', provider: 'tvtvhd.com' },
-  { name: 'Fox Sports', url: 'https://tvtvhd.com/vivo/canales.php?stream=foxsports', provider: 'tvtvhd.com' },
-  { name: 'Fox Sports 2', url: 'https://tvtvhd.com/vivo/canales.php?stream=foxsports2', provider: 'tvtvhd.com' },
-  { name: 'Fox Sports 3', url: 'https://tvtvhd.com/vivo/canales.php?stream=foxsports3', provider: 'tvtvhd.com' },
-  { name: 'TyC Sports', url: 'https://tvtvhd.com/vivo/canales.php?stream=tycsports', provider: 'tvtvhd.com' },
-  { name: 'Liga1 MAX', url: 'https://tvtvhd.com/vivo/canales.php?stream=liga1max', provider: 'tvtvhd.com' },
+  { name: 'ESPN', url: 'https://tvtvhd.com/tv/canales.php?stream=espn', provider: 'tvtvhd.com' },
+  { name: 'ESPN 2', url: 'https://tvtvhd.com/tv/canales.php?stream=espn2', provider: 'tvtvhd.com' },
+  { name: 'ESPN 3', url: 'https://tvtvhd.com/tv/canales.php?stream=espn3', provider: 'tvtvhd.com' },
+  { name: 'ESPN Premium', url: 'https://tvtvhd.com/tv/canales.php?stream=espnpremium', provider: 'tvtvhd.com' },
+  { name: 'DIRECTV Sports (DSPORTS)', url: 'https://tvtvhd.com/tv/canales.php?stream=dsports', provider: 'tvtvhd.com' },
+  { name: 'Fox Sports', url: 'https://tvtvhd.com/tv/canales.php?stream=foxsports', provider: 'tvtvhd.com' },
+  { name: 'Fox Sports 2', url: 'https://tvtvhd.com/tv/canales.php?stream=foxsports2', provider: 'tvtvhd.com' },
+  { name: 'Fox Sports 3', url: 'https://tvtvhd.com/tv/canales.php?stream=foxsports3', provider: 'tvtvhd.com' },
+  { name: 'TyC Sports', url: 'https://tvtvhd.com/tv/canales.php?stream=tycsports', provider: 'tvtvhd.com' },
+  { name: 'Liga1 MAX', url: 'https://tvtvhd.com/tv/canales.php?stream=liga1max', provider: 'tvtvhd.com' },
 ];
 
 export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlayerModalProps) {
@@ -93,7 +93,7 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
                 </button>
 
                 {showDropdown && (
-                  <div className="absolute right-0 mt-1.5 w-56 rounded-xl bg-slate-900 border border-border/40 shadow-xl overflow-hidden py-1">
+                  <div className="absolute right-0 mt-1.5 w-56 rounded-xl bg-slate-900 border border-border/40 shadow-xl overflow-y-auto max-h-[280px] py-1">
                     <div className="px-3 py-1 text-[10px] font-bold text-muted-foreground uppercase border-b border-border/20 mb-1">
                       Señales Disponibles
                     </div>
