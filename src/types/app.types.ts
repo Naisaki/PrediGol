@@ -33,6 +33,14 @@ export interface Group {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  // Configuración del grupo
+  welcomeMessage?: string | null;
+  joinApproval?: boolean;
+  joinsOpen?: boolean;
+  maxMembers?: number | null;
+  scoringExactScore?: number;
+  scoringCorrectResult?: number;
+  scoringGoalDiff?: number;
   // Relaciones opcionales (joined)
   memberCount?: number;
   currentUserRole?: GroupMemberRole;
@@ -228,6 +236,33 @@ export interface PredictionScore {
   exactScoreHit: boolean;
   resultHit: boolean;
   goalDifferenceHit: boolean;
+}
+
+// ---- Estadísticas del Grupo --------------------------------
+
+export interface GroupMemberStat {
+  userId: string;
+  username: string;
+  avatarUrl: string | null;
+  predictionsCount: number;
+  participationPct: number;
+}
+
+export interface GroupTopMatch {
+  matchId: string;
+  homeTeamName: string | null;
+  awayTeamName: string | null;
+  predictionsCount: number;
+}
+
+export interface GroupStats {
+  totalPredictions: number;
+  totalMatches: number;
+  participationRate: number;
+  memberStats: GroupMemberStat[];
+  topMatches: GroupTopMatch[];
+  daysActive: number;
+  createdAt: string;
 }
 
 // ---- UI Helpers --------------------------------------------

@@ -68,6 +68,15 @@ export default async function GroupDetailPage({ params }: PageProps) {
             <p className="text-muted-foreground text-sm mt-1">{group.description}</p>
           )}
         </div>
+        {currentUserRole === 'owner' && (
+          <Link
+            href={`/groups/${groupId}/settings`}
+            className={buttonVariants({ variant: 'outline', size: 'sm' })}
+          >
+            <Settings className="h-4 w-4 mr-2" />
+            Configuración
+          </Link>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

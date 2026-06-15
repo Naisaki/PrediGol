@@ -341,8 +341,6 @@ export async function getGroupRanking(groupId: string) {
   }).map((entry, index) => ({ ...entry, position: index + 1 }));
 }
 
-// ---- Mapper ------------------------------------------------
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapGroupRow(row: any): Group {
   return {
@@ -355,6 +353,13 @@ function mapGroupRow(row: any): Group {
     inviteUrl: row.invite_url ?? null,
     qrCodeUrl: row.qr_code_url ?? null,
     isActive: row.is_active ?? true,
+    welcomeMessage: row.welcome_message ?? null,
+    joinApproval: row.join_approval ?? false,
+    joinsOpen: row.joins_open ?? true,
+    maxMembers: row.max_members ?? null,
+    scoringExactScore: row.scoring_exact_score ?? 5,
+    scoringCorrectResult: row.scoring_correct_result ?? 3,
+    scoringGoalDiff: row.scoring_goal_diff ?? 1,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -378,4 +383,201 @@ function mapGroupMemberRow(row: any): GroupMember {
       updatedAt: row.profile.updated_at || new Date().toISOString(),
     } : undefined,
   };
+}
+
+// ---- Configuración del grupo (solo owner) ------------------
+
+export async function updateGroupInfo(
+  groupId: string,
+  requestingUserId: string,
+  data: { name: string; description: string | null; imageUrl: string | null },
+): Promise<void> {
+  const supabase = createServiceClient();
+  await assertOwner(supabase, groupId, requestingUserId);
+  const { error } = await supabase
+    .from('groups')
+    .update({ name: data.name, description: data.description, image_url: data.imageUrl, updated_at: new Date().toISOString() })
+    .eq('id', groupId);
+  if (error) throw new Error(`updateGroupInfo: ${error.message}`);
+}
+
+export async function updateGroupSettings(
+  groupId: string,
+  requestingUserId: string,
+  data: { welcomeMessage: string | null; joinsOpen: boolean; joinApproval: boolean; maxMembers: number | null },
+): Promise<void> {
+  const supabase = createServiceClient();
+  await assertOwner(supabase, groupId, requestingUserId);
+  const { error } = await supabase
+    .from('groups')
+    .update({
+      welcome_message: data.welcomeMessage,
+      joins_open: data.joinsOpen,
+      join_approval: data.joinApproval,
+      max_members: data.maxMembers,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', groupId);
+  if (error) throw new Error(`updateGroupSettings: ${error.message}`);
+}
+
+export async function updateScoringRules(
+  groupId: string,
+  requestingUserId: string,
+  data: { exactScore: number; correctResult: number; goalDiff: number },
+): Promise<void> {
+  const supabase = createServiceClient();
+  await assertOwner(supabase, groupId, requestingUserId);
+  const { error } = await supabase
+    .from('groups')
+    .update({
+      scoring_exact_score: data.exactScore,
+      scoring_correct_result: data.correctResult,
+      scoring_goal_diff: data.goalDiff,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', groupId);
+  if (error) throw new Error(`updateScoringRules: ${error.message}`);
+}
+
+export async function updateMemberRole(
+  groupId: string,
+  requestingUserId: string,
+  targetUserId: string,
+  newRole: 'admin' | 'member',
+): Promise<void> {
+  const supabase = createServiceClient();
+  await assertOwner(supabase, groupId, requestingUserId);
+  if (targetUserId === requestingUserId) throw new Error('No puedes cambiar tu propio rol.');
+  const { error } = await supabase
+    .from('group_members')
+    .update({ role: newRole })
+    .eq('group_id', groupId)
+    .eq('user_id', targetUserId)
+    .neq('role', 'owner');
+  if (error) throw new Error(`updateMemberRole: ${error.message}`);
+}
+
+export async function transferOwnership(
+  groupId: string,
+  currentOwnerId: string,
+  newOwnerId: string,
+): Promise<void> {
+  const supabase = createServiceClient();
+  await assertOwner(supabase, groupId, currentOwnerId);
+  if (newOwnerId === currentOwnerId) throw new Error('Ya eres el owner del grupo.');
+
+  // Verificar que el nuevo owner es miembro
+  const { data: targetMember } = await supabase
+    .from('group_members')
+    .select('id')
+    .eq('group_id', groupId)
+    .eq('user_id', newOwnerId)
+    .single();
+  if (!targetMember) throw new Error('El nuevo owner debe ser miembro del grupo.');
+
+  // Transferencia atómica: nuevo owner + degradar anterior a admin
+  const [r1, r2, r3] = await Promise.all([
+    supabase.from('group_members').update({ role: 'owner' }).eq('group_id', groupId).eq('user_id', newOwnerId),
+    supabase.from('group_members').update({ role: 'admin' }).eq('group_id', groupId).eq('user_id', currentOwnerId),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    supabase.from('groups').update({ owner_id: newOwnerId, updated_at: new Date().toISOString() } as any).eq('id', groupId),
+  ]);
+  if (r1.error) throw new Error(`transferOwnership (new): ${r1.error.message}`);
+  if (r2.error) throw new Error(`transferOwnership (old): ${r2.error.message}`);
+  if (r3.error) throw new Error(`transferOwnership (groups): ${r3.error.message}`);
+}
+
+export async function closeGroup(
+  groupId: string,
+  requestingUserId: string,
+): Promise<void> {
+  const supabase = createServiceClient();
+  await assertOwner(supabase, groupId, requestingUserId);
+  const { error } = await supabase
+    .from('groups')
+    .update({ is_active: false, updated_at: new Date().toISOString() })
+    .eq('id', groupId);
+  if (error) throw new Error(`closeGroup: ${error.message}`);
+}
+
+export async function deleteGroup(
+  groupId: string,
+  requestingUserId: string,
+): Promise<void> {
+  const supabase = createServiceClient();
+  await assertOwner(supabase, groupId, requestingUserId);
+  const { error } = await supabase.from('groups').delete().eq('id', groupId);
+  if (error) throw new Error(`deleteGroup: ${error.message}`);
+}
+
+export async function getGroupStats(groupId: string): Promise<import('@/types/app.types').GroupStats> {
+  const supabase = createServiceClient();
+
+  const [{ data: members }, { data: predictions }, { data: matches }, { data: group }] = await Promise.all([
+    supabase.from('group_members').select('user_id, joined_at').eq('group_id', groupId),
+    supabase.from('predictions').select('user_id, match_id').eq('group_id', groupId),
+    supabase.from('matches').select('id, home_team_name, away_team_name').in('status', ['scheduled','timed','in_play','paused','finished']),
+    supabase.from('groups').select('created_at').eq('id', groupId).single(),
+  ]);
+
+  const membersList = members ?? [];
+  const predsList = predictions ?? [];
+  const matchesList = matches ?? [];
+  const totalMatches = matchesList.length;
+  const totalPredictions = predsList.length;
+
+  // Perfiles en lote
+  const userIds = membersList.map((m) => m.user_id);
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('user_id, username, avatar_url')
+    .in('user_id', userIds);
+  const profilesMap = new Map(profiles?.map((p) => [p.user_id, p]) ?? []);
+
+  // Stats por miembro
+  const memberStats = membersList.map((m) => {
+    const count = predsList.filter((p) => p.user_id === m.user_id).length;
+    const profile = profilesMap.get(m.user_id);
+    return {
+      userId: m.user_id,
+      username: profile?.username ?? 'Usuario',
+      avatarUrl: profile?.avatar_url ?? null,
+      predictionsCount: count,
+      participationPct: totalMatches > 0 ? Math.round((count / totalMatches) * 100) : 0,
+    };
+  }).sort((a, b) => b.predictionsCount - a.predictionsCount);
+
+  // Top matches con más predicciones
+  const matchCountMap = new Map<string, number>();
+  for (const p of predsList) {
+    matchCountMap.set(p.match_id, (matchCountMap.get(p.match_id) ?? 0) + 1);
+  }
+  const topMatches = matchesList
+    .map((m) => ({ matchId: m.id, homeTeamName: m.home_team_name, awayTeamName: m.away_team_name, predictionsCount: matchCountMap.get(m.id) ?? 0 }))
+    .filter((m) => m.predictionsCount > 0)
+    .sort((a, b) => b.predictionsCount - a.predictionsCount)
+    .slice(0, 3);
+
+  const createdAt = group?.created_at ?? new Date().toISOString();
+  const daysActive = Math.max(1, Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000));
+  const participationRate = totalMatches > 0 && membersList.length > 0
+    ? Math.round((totalPredictions / (totalMatches * membersList.length)) * 100)
+    : 0;
+
+  return { totalPredictions, totalMatches, participationRate, memberStats, topMatches, daysActive, createdAt };
+}
+
+// ---- Helper interno: verificar que el usuario es owner -----
+
+async function assertOwner(supabase: ReturnType<typeof createServiceClient>, groupId: string, userId: string) {
+  const { data: member } = await supabase
+    .from('group_members')
+    .select('role')
+    .eq('group_id', groupId)
+    .eq('user_id', userId)
+    .single();
+  if (!member || member.role !== 'owner') {
+    throw new Error('Solo el owner del grupo puede realizar esta acción.');
+  }
 }
