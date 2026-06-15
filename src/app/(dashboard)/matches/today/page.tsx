@@ -189,9 +189,6 @@ function MatchStatusCard({ match }: MatchStatusCardProps) {
                 src={match.home_team_crest}
                 alt={match.home_team_name ?? ''}
                 className="team-flag w-8 h-6"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
               />
             )}
             <span
@@ -234,9 +231,6 @@ function MatchStatusCard({ match }: MatchStatusCardProps) {
                 src={match.away_team_crest}
                 alt={match.away_team_name ?? ''}
                 className="team-flag w-8 h-6"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
               />
             )}
             <span
