@@ -6,6 +6,13 @@ import { Calendar } from 'lucide-react';
 import { LocalTime } from '@/components/common/local-time';
 import { cn } from '@/lib/utils/cn';
 
+function getLocalDateString(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 interface DbMatch {
   id: string;
   external_api_id: number;
@@ -39,12 +46,12 @@ interface MatchesCalendarProps {
 }
 
 export function MatchesCalendar({ initialMatches }: MatchesCalendarProps) {
-  // 1. Agrupar partidos por fecha (YYYY-MM-DD)
+  // 1. Agrupar partidos por fecha (YYYY-MM-DD en zona horaria local)
   const matchesByDate = useMemo(() => {
     const groups: Record<string, DbMatch[]> = {};
     initialMatches.forEach((match) => {
       if (!match.kickoff_time) return;
-      const dateStr = new Date(match.kickoff_time).toISOString().split('T')[0];
+      const dateStr = getLocalDateString(new Date(match.kickoff_time));
       if (!groups[dateStr]) {
         groups[dateStr] = [];
       }
@@ -58,9 +65,9 @@ export function MatchesCalendar({ initialMatches }: MatchesCalendarProps) {
     return Object.keys(matchesByDate).sort();
   }, [matchesByDate]);
 
-  // 3. Determinar fecha seleccionada por defecto (hoy, o la primera fecha disponible si hoy no tiene partidos)
+  // 3. Determinar fecha seleccionada por defecto (hoy local, o la primera fecha disponible si hoy no tiene partidos)
   const defaultDate = useMemo(() => {
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = getLocalDateString(new Date());
     if (matchesByDate[todayStr]) {
       return todayStr;
     }
@@ -136,7 +143,7 @@ export function MatchesCalendar({ initialMatches }: MatchesCalendarProps) {
           {dates.map((dateStr) => {
             const isSelected = selectedDate === dateStr;
             const { weekday, dayNum, month } = formatBtnDate(dateStr);
-            const isTodayDate = new Date().toISOString().split('T')[0] === dateStr;
+            const isTodayDate = getLocalDateString(new Date()) === dateStr;
 
             return (
               <button
