@@ -55,11 +55,15 @@ export async function createGroup(
   if (error || !data) throw new Error(`createGroup: ${error?.message}`);
 
   // Agregar al owner como miembro con rol 'owner'
-  await supabase.from('group_members').insert({
+  const { error: memberError } = await supabase.from('group_members').insert({
     group_id: data.id,
     user_id: ownerId,
     role: 'owner',
   });
+
+  if (memberError) {
+    throw new Error(`No se pudo registrar como miembro del grupo: ${memberError.message}`);
+  }
 
   return mapGroupRow(data);
 }
