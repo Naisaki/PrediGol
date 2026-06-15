@@ -57,7 +57,7 @@ export function normalizeFootballDataMatch(apiMatch: FDMatch): NormalizedMatch {
     kickoffTime: apiMatch.utcDate, // football-data devuelve UTC, se guarda como kickoff_time
     status: normalizeMatchStatus(apiMatch.status),
     matchday: apiMatch.matchday ?? null,
-    stage: apiMatch.stage ?? null,
+    stage: apiMatch.stage === 'LAST_16' ? 'ROUND_OF_16' : (apiMatch.stage ?? null),
     groupName: apiMatch.group ?? null,
     homeTeamExternalId: apiMatch.homeTeam?.id ?? null,
     awayTeamExternalId: apiMatch.awayTeam?.id ?? null,

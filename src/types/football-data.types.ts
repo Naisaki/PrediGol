@@ -70,6 +70,7 @@ export interface FDMatch {
   stage:
     | 'GROUP_STAGE'
     | 'ROUND_OF_16'
+    | 'LAST_16'
     | 'QUARTER_FINALS'
     | 'SEMI_FINALS'
     | 'THIRD_PLACE'

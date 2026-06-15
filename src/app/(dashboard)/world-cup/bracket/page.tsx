@@ -31,9 +31,12 @@ export default async function WorldCupBracketPage() {
 
   // Agrupar y ordenar partidos por fase
   const matchesByStage = allMatches.reduce((acc, match) => {
-    if (match.stage && stagesOrder.includes(match.stage)) {
-      if (!acc[match.stage]) acc[match.stage] = [];
-      acc[match.stage].push(match);
+    // Normalizar a ROUND_OF_16 si la DB tiene LAST_16
+    const normalizedStage = (match.stage as any) === 'LAST_16' ? 'ROUND_OF_16' : match.stage;
+    if (normalizedStage && stagesOrder.includes(normalizedStage as MatchStage)) {
+      const stageKey = normalizedStage as MatchStage;
+      if (!acc[stageKey]) acc[stageKey] = [];
+      acc[stageKey].push(match);
     }
     return acc;
   }, {} as Record<MatchStage, Match[]>);
