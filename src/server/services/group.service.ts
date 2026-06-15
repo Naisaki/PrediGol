@@ -130,7 +130,7 @@ export async function getGroupMembers(groupId: string): Promise<GroupMember[]> {
     .order('joined_at', { ascending: true });
 
   if (error) throw new Error(`getGroupMembers: ${error.message}`);
-  return (data ?? []) as unknown as GroupMember[];
+  return (data as any[] ?? []).map(mapGroupMemberRow);
 }
 
 // ---- Unirse a grupo ----------------------------------------
@@ -339,5 +339,25 @@ function mapGroupRow(row: any): Group {
     isActive: row.is_active ?? true,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+  };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapGroupMemberRow(row: any): GroupMember {
+  return {
+    id: row.id,
+    groupId: row.group_id,
+    userId: row.user_id,
+    role: row.role,
+    joinedAt: row.joined_at,
+    profile: row.profile ? {
+      id: row.profile.id,
+      userId: row.profile.user_id,
+      username: row.profile.username,
+      fullName: row.profile.full_name ?? null,
+      avatarUrl: row.profile.avatar_url ?? null,
+      createdAt: row.profile.created_at || new Date().toISOString(),
+      updatedAt: row.profile.updated_at || new Date().toISOString(),
+    } : undefined,
   };
 }
