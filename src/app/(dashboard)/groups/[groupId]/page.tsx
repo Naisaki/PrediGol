@@ -49,17 +49,6 @@ export default async function GroupDetailPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Back button */}
-      <div>
-        <Link
-          href="/groups"
-          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Volver a Mis Grupos
-        </Link>
-      </div>
-
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>

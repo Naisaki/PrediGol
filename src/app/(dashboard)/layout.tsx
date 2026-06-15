@@ -8,6 +8,7 @@ import { redirect } from 'next/navigation';
 import { SidebarNav } from '@/components/layout/sidebar-nav';
 import { MobileNav } from '@/components/layout/mobile-nav';
 import { DashboardHeader } from '@/components/layout/dashboard-header';
+import { BreadcrumbNav } from '@/components/layout/breadcrumb-nav';
 
 export default async function DashboardLayout({
   children,
@@ -49,6 +50,7 @@ export default async function DashboardLayout({
 
         {/* Main content */}
         <main className="flex-1 p-4 lg:p-6 pb-24 lg:pb-6 max-w-5xl w-full">
+          <BreadcrumbNav />
           {children}
         </main>
       </div>

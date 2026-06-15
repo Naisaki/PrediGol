@@ -37,13 +37,6 @@ export default async function GroupSettingsLayout({ params, children }: LayoutPr
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col gap-2">
-        <Link
-          href={`/groups/${groupId}`}
-          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors w-fit"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Volver al grupo
-        </Link>
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-muted/30 border border-border/40 flex items-center justify-center">
             <Settings2 className="h-4.5 w-4.5 text-muted-foreground" />
