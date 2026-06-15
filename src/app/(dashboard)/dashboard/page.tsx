@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ApiDelayNotice } from '@/components/common/api-delay-notice';
+import { LocalTime } from '@/components/common/local-time';
 import { getGroupRanking } from '@/server/services/group.service';
 import type { Metadata } from 'next';
 
@@ -208,10 +209,7 @@ export default async function DashboardPage() {
                     <span className="font-medium">{match.away_team_name ?? 'TBD'}</span>
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {new Date(match.kickoff_time).toLocaleTimeString('es', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
+                    <LocalTime utcDate={match.kickoff_time} />
                   </div>
                 </div>
               ))

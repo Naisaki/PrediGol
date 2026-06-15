@@ -8,6 +8,7 @@ import { Calendar, Clock, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ApiDelayNotice } from '@/components/common/api-delay-notice';
+import { LocalTime } from '@/components/common/local-time';
 import { cn } from '@/lib/utils/cn';
 import type { Metadata } from 'next';
 
@@ -165,10 +166,7 @@ function MatchStatusCard({ match }: MatchStatusCardProps) {
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Clock className="h-3 w-3" />
             <span>
-              {new Date(match.kickoff_time).toLocaleTimeString('es', {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
+              <LocalTime utcDate={match.kickoff_time} />
             </span>
             {match.group_name && (
               <span>· Grupo {match.group_name.replace('GROUP_', '')}</span>
@@ -215,10 +213,7 @@ function MatchStatusCard({ match }: MatchStatusCardProps) {
               </div>
             ) : (
               <div className="text-xl font-bold text-muted-foreground">
-                {new Date(match.kickoff_time).toLocaleTimeString('es', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+                <LocalTime utcDate={match.kickoff_time} />
               </div>
             )}
           </div>
