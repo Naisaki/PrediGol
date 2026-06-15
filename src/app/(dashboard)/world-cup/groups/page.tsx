@@ -27,7 +27,9 @@ export default async function WorldCupGroupsPage() {
     return acc;
   }, {} as Record<string, WorldCupStanding[]>);
 
-  const groupKeys = Object.keys(groupedStandings).sort();
+  const groupKeys = Object.keys(groupedStandings)
+    .filter((key) => key.toLowerCase().includes('group') || key.toLowerCase().includes('grupo'))
+    .sort();
 
   return (
     <div className="space-y-6 animate-fade-in">
