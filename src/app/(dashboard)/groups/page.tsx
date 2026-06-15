@@ -9,6 +9,7 @@ import { Plus, Users, Hash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { JoinGroupForm } from '@/components/groups/join-group-form';
+import { getUserGroups } from '@/server/services/group.service';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = { title: 'Mis Grupos' };
@@ -21,19 +22,7 @@ export default async function GroupsPage() {
 
   if (!user) return null;
 
-  const { data: memberships } = await supabase
-    .from('group_members')
-    .select(`
-      role,
-      joined_at,
-      group:groups (
-        id, name, description, owner_id, invite_code, is_active, created_at
-      )
-    `)
-    .eq('user_id', user.id)
-    .order('joined_at', { ascending: false });
-
-  const groups = (memberships as any[] ?? []).filter((m) => m.group !== null);
+  const groups = await getUserGroups(user.id);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -81,15 +70,7 @@ export default async function GroupsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {(groups as any[]).map((membership) => {
-            const g = membership.group as {
-              id: string;
-              name: string;
-              description: string | null;
-              owner_id: string;
-              invite_code: string;
-              is_active: boolean;
-            };
+          {groups.map((g) => {
             return (
               <Link key={g.id} href={`/groups/${g.id}`}>
                 <Card className="glass-card border-border/40 hover:border-primary/30 transition-all hover:shadow-lg hover:shadow-primary/5 cursor-pointer h-full group">
@@ -99,7 +80,7 @@ export default async function GroupsPage() {
                         <Users className="h-6 w-6 text-primary" />
                       </div>
                       <span className="text-xs px-2 py-1 rounded-full bg-muted/60 text-muted-foreground capitalize">
-                        {membership.role}
+                        {g.currentUserRole}
                       </span>
                     </div>
 
@@ -115,7 +96,7 @@ export default async function GroupsPage() {
 
                     <div className="flex items-center gap-2 text-xs text-muted-foreground mt-auto">
                       <Hash className="h-3 w-3" />
-                      <span className="font-mono tracking-widest">{g.invite_code}</span>
+                      <span className="font-mono tracking-widest">{g.inviteCode}</span>
                     </div>
                   </CardContent>
                 </Card>

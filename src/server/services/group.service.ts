@@ -69,7 +69,7 @@ export async function createGroup(
 }
 
 export async function getGroupById(groupId: string): Promise<Group | null> {
-  const supabase = await createClient();
+  const supabase = createServiceClient();
   const { data, error } = await supabase
     .from('groups')
     .select('*')
