@@ -152,14 +152,14 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
               allowFullScreen
               sandbox="allow-scripts allow-same-origin allow-presentation allow-forms allow-popups allow-popups-to-escape-sandbox"
             />
-            
-            {/* Aviso flotante de seguridad */}
-            <div className="absolute bottom-2 left-2 right-2 bg-black/85 backdrop-blur border border-white/10 rounded-lg p-2 flex items-center gap-2 text-[10px] text-muted-foreground z-10">
-              <ShieldAlert className="h-4.5 w-4.5 text-amber-500 flex-shrink-0" />
-              <span>
-                Aviso: Señal provista por {activeChannel.provider}. Utiliza un adblocker si experimentas exceso de anuncios emergentes del reproductor de origen.
-              </span>
-            </div>
+          </div>
+          
+          {/* Aviso estático de seguridad */}
+          <div className="bg-slate-900 border-t border-border/20 px-4 py-2.5 flex items-center gap-2.5 text-[10px] text-muted-foreground">
+            <ShieldAlert className="h-4 w-4 text-amber-500 flex-shrink-0" />
+            <span>
+              Aviso: Señal provista por {activeChannel.provider}. Utiliza un adblocker si experimentas exceso de anuncios emergentes del reproductor de origen.
+            </span>
           </div>
         </DialogContent>
       </Dialog>
