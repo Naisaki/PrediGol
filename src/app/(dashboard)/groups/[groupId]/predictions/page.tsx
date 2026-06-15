@@ -5,8 +5,9 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { ApiDelayNotice } from '@/components/common/api-delay-notice';
-import { Target, Lock } from 'lucide-react';
+import { Target, Lock, ArrowLeft } from 'lucide-react';
 import { getGroupById, getGroupMembers } from '@/server/services/group.service';
 import { getUserPredictionsForGroup } from '@/server/services/prediction.service';
 import { PredictionsTabsView } from '@/components/predictions/predictions-tabs-view';
@@ -52,6 +53,17 @@ export default async function PredictionsPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Back button */}
+      <div>
+        <Link
+          href={`/groups/${groupId}`}
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Volver a {group.name}
+        </Link>
+      </div>
+
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Target className="h-6 w-6 text-primary" />

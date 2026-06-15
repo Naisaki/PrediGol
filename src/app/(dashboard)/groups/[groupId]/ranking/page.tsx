@@ -5,8 +5,9 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { getGroupRanking, getGroupById, getGroupMembers } from '@/server/services/group.service';
-import { Trophy, Medal, Target, Hash, TrendingUp } from 'lucide-react';
+import { Trophy, Medal, Target, Hash, TrendingUp, ArrowLeft } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils/cn';
@@ -50,6 +51,17 @@ export default async function GroupRankingPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Back button */}
+      <div>
+        <Link
+          href={`/groups/${groupId}`}
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Volver a {group.name}
+        </Link>
+      </div>
+
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Trophy className="h-6 w-6 text-secondary" />
