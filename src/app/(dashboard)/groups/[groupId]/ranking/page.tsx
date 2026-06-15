@@ -5,7 +5,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
-import { getGroupRanking } from '@/server/services/group.service';
+import { getGroupRanking, getGroupById, getGroupMembers } from '@/server/services/group.service';
 import { Trophy, Medal, Target, Hash, TrendingUp } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,22 +27,18 @@ export default async function GroupRankingPage({ params }: PageProps) {
 
   if (!user) return null;
 
-  // Verificar membresía
-  const { data: membership } = await supabase
-    .from('group_members')
-    .select('role')
-    .eq('group_id', groupId)
-    .eq('user_id', user.id)
-    .single();
-
-  if (!membership) notFound();
-
   // Obtener grupo
-  const { data: group } = await supabase
-    .from('groups')
-    .select('name')
-    .eq('id', groupId)
-    .single();
+  const group = await getGroupById(groupId);
+  if (!group || !group.isActive) {
+    notFound();
+  }
+
+  // Verificar membresía
+  const members = await getGroupMembers(groupId);
+  const currentMember = members.find((m) => m.userId === user.id);
+  if (!currentMember) {
+    notFound();
+  }
 
   const ranking = await getGroupRanking(groupId);
 

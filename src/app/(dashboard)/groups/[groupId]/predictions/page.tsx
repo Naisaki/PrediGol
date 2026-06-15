@@ -8,6 +8,7 @@ import { notFound } from 'next/navigation';
 import { PredictionCard } from '@/components/predictions/prediction-card';
 import { ApiDelayNotice } from '@/components/common/api-delay-notice';
 import { Target, Lock } from 'lucide-react';
+import { getGroupById, getGroupMembers } from '@/server/services/group.service';
 import { Card, CardContent } from '@/components/ui/card';
 import type { Metadata } from 'next';
 
@@ -26,22 +27,18 @@ export default async function PredictionsPage({ params }: PageProps) {
 
   if (!user) return null;
 
-  // Verificar membresía
-  const { data: membership } = await supabase
-    .from('group_members')
-    .select('role')
-    .eq('group_id', groupId)
-    .eq('user_id', user.id)
-    .single();
-
-  if (!membership) notFound();
-
   // Obtener grupo
-  const { data: group } = await supabase
-    .from('groups')
-    .select('name')
-    .eq('id', groupId)
-    .single();
+  const group = await getGroupById(groupId);
+  if (!group || !group.isActive) {
+    notFound();
+  }
+
+  // Verificar membresía
+  const members = await getGroupMembers(groupId);
+  const currentMember = members.find((m) => m.userId === user.id);
+  if (!currentMember) {
+    notFound();
+  }
 
   // Obtener partidos disponibles para pronosticar
   const { data: matches } = await supabase

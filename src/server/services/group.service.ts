@@ -120,17 +120,32 @@ export async function getUserGroups(userId: string): Promise<Group[]> {
 
 export async function getGroupMembers(groupId: string): Promise<GroupMember[]> {
   const supabase = createServiceClient();
-  const { data, error } = await supabase
+  const { data: members, error: membersError } = await supabase
     .from('group_members')
-    .select(`
-      *,
-      profile:profiles (id, user_id, username, full_name, avatar_url)
-    `)
+    .select('*')
     .eq('group_id', groupId)
     .order('joined_at', { ascending: true });
 
-  if (error) throw new Error(`getGroupMembers: ${error.message}`);
-  return (data as any[] ?? []).map(mapGroupMemberRow);
+  if (membersError) throw new Error(`getGroupMembers: ${membersError.message}`);
+  if (!members || members.length === 0) return [];
+
+  const userIds = members.map((m) => m.user_id);
+  const { data: profiles, error: profilesError } = await supabase
+    .from('profiles')
+    .select('id, user_id, username, full_name, avatar_url')
+    .in('user_id', userIds);
+
+  if (profilesError) throw new Error(`getGroupMembers profiles: ${profilesError.message}`);
+
+  const profilesMap = new Map(profiles?.map((p) => [p.user_id, p]) ?? []);
+
+  return members.map((m) => {
+    const profile = profilesMap.get(m.user_id);
+    return mapGroupMemberRow({
+      ...m,
+      profile,
+    });
+  });
 }
 
 // ---- Unirse a grupo ----------------------------------------
@@ -252,19 +267,26 @@ export async function removeMember(
 export async function getGroupRanking(groupId: string) {
   const supabase = createServiceClient();
 
-  const { data: members } = await supabase
+  const { data: members, error: membersError } = await supabase
     .from('group_members')
-    .select(`
-      user_id,
-      joined_at,
-      profile:profiles (username, full_name, avatar_url)
-    `)
+    .select('user_id, joined_at')
     .eq('group_id', groupId);
 
-  if (!members) return [];
+  if (membersError) throw new Error(`getGroupRanking members: ${membersError.message}`);
+  if (!members || members.length === 0) return [];
+
+  const userIds = members.map((m) => m.user_id);
+  const { data: profiles, error: profilesError } = await supabase
+    .from('profiles')
+    .select('user_id, username, full_name, avatar_url')
+    .in('user_id', userIds);
+
+  if (profilesError) throw new Error(`getGroupRanking profiles: ${profilesError.message}`);
+
+  const profilesMap = new Map(profiles?.map((p) => [p.user_id, p]) ?? []);
 
   const ranking = await Promise.all(
-    (members as any[]).map(async (member) => {
+    members.map(async (member) => {
       const { data: stats } = await supabase
         .from('predictions')
         .select(
@@ -287,11 +309,7 @@ export async function getGroupRanking(groupId: string) {
         (p) => !p.result_hit,
       ).length;
 
-      const profile = member.profile as {
-        username: string;
-        full_name: string | null;
-        avatar_url: string | null;
-      } | null;
+      const profile = profilesMap.get(member.user_id);
 
       return {
         userId: member.user_id,
