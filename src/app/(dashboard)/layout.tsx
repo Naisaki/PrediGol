@@ -49,7 +49,7 @@ export default async function DashboardLayout({
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 p-4 lg:p-6 pb-24 lg:pb-6 max-w-5xl w-full">
+        <main className="flex-1 p-4 lg:p-6 pb-24 lg:pb-6 max-w-7xl w-full">
           <BreadcrumbNav />
           {children}
         </main>

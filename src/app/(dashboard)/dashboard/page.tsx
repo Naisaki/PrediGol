@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ApiDelayNotice } from '@/components/common/api-delay-notice';
 import { LocalTime } from '@/components/common/local-time';
-import { getGroupRanking } from '@/server/services/group.service';
+import { getGroupRanking, getUserGroups } from '@/server/services/group.service';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = { title: 'Dashboard' };
@@ -37,27 +37,23 @@ export default async function DashboardPage() {
     .eq('user_id', user.id)
     .maybeSingle();
 
-  // Grupos del usuario
-  const { data: memberships } = await supabase
-    .from('group_members')
-    .select('group:groups (id, name)')
-    .eq('user_id', user.id)
-    .limit(5);
+  // Grupos del usuario obtenidos con el servicio para asegurar datos frescos
+  const groups = await getUserGroups(user.id);
 
   // Partidos de hoy
   const today = new Date();
-  const startOfDay = new Date(today.setHours(0, 0, 0, 0)).toISOString();
-  const endOfDay = new Date(today.setHours(23, 59, 59, 999)).toISOString();
+  const startOfDay = new Date(today);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(today);
+  endOfDay.setHours(23, 59, 59, 999);
 
   const { data: todayMatches } = await supabase
     .from('matches')
-    .select('id, home_team_name, away_team_name, kickoff_time, status')
-    .gte('kickoff_time', startOfDay)
-    .lte('kickoff_time', endOfDay)
+    .select('id, home_team_name, away_team_name, home_team_crest, away_team_crest, kickoff_time, status')
+    .gte('kickoff_time', startOfDay.toISOString())
+    .lte('kickoff_time', endOfDay.toISOString())
     .order('kickoff_time')
     .limit(5);
-
-  const groups = (memberships as any[])?.map((m) => m.group).filter(Boolean) ?? [];
 
   const firstName = profile?.full_name?.split(' ')[0] ?? profile?.username ?? 'Jugador';
 
@@ -201,14 +197,46 @@ export default async function DashboardPage() {
               todayMatches.map((match) => (
                 <div
                   key={match.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-muted/20"
+                  className="flex items-center justify-between p-3.5 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors border border-border/10"
                 >
-                  <div className="text-sm">
-                    <span className="font-medium">{match.home_team_name ?? 'TBD'}</span>
-                    <span className="text-muted-foreground mx-2">vs</span>
-                    <span className="font-medium">{match.away_team_name ?? 'TBD'}</span>
+                  <div className="flex items-center gap-3 text-sm">
+                    {/* Home Team Flag */}
+                    <div className="flex items-center gap-1.5">
+                      {match.home_team_crest ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={match.home_team_crest}
+                          alt={match.home_team_name ?? 'TBD'}
+                          className="w-4 h-4 object-contain"
+                        />
+                      ) : (
+                        <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center text-[7px] font-bold">
+                          H
+                        </div>
+                      )}
+                      <span className="font-medium text-foreground">{match.home_team_name ?? 'TBD'}</span>
+                    </div>
+
+                    <span className="text-muted-foreground font-semibold text-xs">vs</span>
+
+                    {/* Away Team Flag */}
+                    <div className="flex items-center gap-1.5">
+                      {match.away_team_crest ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={match.away_team_crest}
+                          alt={match.away_team_name ?? 'TBD'}
+                          className="w-4 h-4 object-contain"
+                        />
+                      ) : (
+                        <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center text-[7px] font-bold">
+                          A
+                        </div>
+                      )}
+                      <span className="font-medium text-foreground">{match.away_team_name ?? 'TBD'}</span>
+                    </div>
                   </div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-xs font-semibold text-primary">
                     <LocalTime utcDate={match.kickoff_time} />
                   </div>
                 </div>
