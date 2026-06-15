@@ -9,6 +9,7 @@ import { PredictionCard } from '@/components/predictions/prediction-card';
 import { ApiDelayNotice } from '@/components/common/api-delay-notice';
 import { Target, Lock } from 'lucide-react';
 import { getGroupById, getGroupMembers } from '@/server/services/group.service';
+import { getUserPredictionsForGroup } from '@/server/services/prediction.service';
 import { Card, CardContent } from '@/components/ui/card';
 import type { Metadata } from 'next';
 
@@ -48,11 +49,7 @@ export default async function PredictionsPage({ params }: PageProps) {
     .order('kickoff_time', { ascending: true });
 
   // Obtener pronósticos existentes del usuario en este grupo
-  const { data: predictions } = await supabase
-    .from('predictions')
-    .select('*')
-    .eq('user_id', user.id)
-    .eq('group_id', groupId);
+  const predictions = (await getUserPredictionsForGroup(user.id, groupId)) as any[];
 
   const predictionsMap = new Map(
     (predictions ?? []).map((p) => [p.match_id, p]),
