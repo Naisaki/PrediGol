@@ -83,7 +83,7 @@ export default async function GroupDetailPage({ params }: PageProps) {
                       <Target className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-sm">Hacer Pronósticos</h3>
+                      <h3 className="font-semibold text-sm">Mis Pronósticos</h3>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         Pronostica los marcadores y suma puntos
                       </p>

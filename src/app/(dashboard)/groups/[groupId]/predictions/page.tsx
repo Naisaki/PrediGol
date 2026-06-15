@@ -5,15 +5,14 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
-import { PredictionCard } from '@/components/predictions/prediction-card';
 import { ApiDelayNotice } from '@/components/common/api-delay-notice';
 import { Target, Lock } from 'lucide-react';
 import { getGroupById, getGroupMembers } from '@/server/services/group.service';
 import { getUserPredictionsForGroup } from '@/server/services/prediction.service';
-import { Card, CardContent } from '@/components/ui/card';
+import { PredictionsTabsView } from '@/components/predictions/predictions-tabs-view';
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = { title: 'Pronósticos' };
+export const metadata: Metadata = { title: 'Mis Pronósticos' };
 
 interface PageProps {
   params: Promise<{ groupId: string }>;
@@ -51,18 +50,12 @@ export default async function PredictionsPage({ params }: PageProps) {
   // Obtener pronósticos existentes del usuario en este grupo
   const predictions = (await getUserPredictionsForGroup(user.id, groupId)) as any[];
 
-  const predictionsMap = new Map(
-    (predictions ?? []).map((p) => [p.match_id, p]),
-  );
-
-  const now = new Date();
-
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Target className="h-6 w-6 text-primary" />
-          Pronósticos
+          Mis Pronósticos
         </h1>
         <p className="text-muted-foreground text-sm mt-1">{group?.name}</p>
       </div>
@@ -78,82 +71,13 @@ export default async function PredictionsPage({ params }: PageProps) {
         </span>
       </div>
 
-      {!matches || matches.length === 0 ? (
-        <Card className="glass-card border-border/40">
-          <CardContent className="text-center py-16">
-            <Target className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
-            <p className="text-muted-foreground">
-              No hay partidos disponibles todavía.
-              <br />
-              El fixture se cargará cuando comience el torneo.
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-4">
-          {/* Agrupar por fecha */}
-          {groupMatchesByDate(matches).map(({ date, matches: dayMatches }) => (
-            <div key={date}>
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-3 px-1">
-                {formatGroupDate(date)}
-              </h3>
-              <div className="space-y-3">
-                {dayMatches.map((match: any) => {
-                  const prediction = predictionsMap.get(match.id) ?? null;
-                  const isLocked = Boolean(
-                    match.is_locked || now >= new Date(match.kickoff_time),
-                  );
-
-                  return (
-                    <PredictionCard
-                      key={match.id}
-                      match={match}
-                      prediction={prediction as any}
-                      groupId={groupId}
-                      isLocked={isLocked}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <PredictionsTabsView
+        matches={matches || []}
+        predictions={predictions}
+        groupId={groupId}
+      />
     </div>
   );
-}
-
-// ---- Helpers -----------------------------------------------
-
-function groupMatchesByDate(matches: any[]) {
-  const grouped = new Map<string, any[]>();
-
-  for (const match of matches) {
-    const date = match.kickoff_time.split('T')[0];
-    if (!grouped.has(date)) grouped.set(date, []);
-    grouped.get(date)!.push(match);
-  }
-
-  return Array.from(grouped.entries()).map(([date, matches]) => ({
-    date,
-    matches,
-  }));
-}
-
-function formatGroupDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-
-  if (dateStr === today.toISOString().split('T')[0]) return 'Hoy';
-  if (dateStr === tomorrow.toISOString().split('T')[0]) return 'Mañana';
-
-  return date.toLocaleDateString('es', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  });
 }
 
 // Type helpers for PredictionCard
