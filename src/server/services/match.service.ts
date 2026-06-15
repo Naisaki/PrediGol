@@ -136,69 +136,66 @@ export async function syncFixturesFromFootballData(): Promise<SyncResult> {
       }
     }
 
-    // 2. Obtener y sincronizar partidos
+    // 2. Traer todos los equipos de la base de datos de una sola vez para resolver IDs en memoria
+    const { data: dbTeams, error: dbTeamsError } = await supabase()
+      .from('teams')
+      .select('id, external_api_id');
+
+    if (dbTeamsError) {
+      throw new Error(`Error al leer equipos: ${dbTeamsError.message}`);
+    }
+
+    const teamIdMap = new Map<number, string>(
+      dbTeams?.map((t) => [t.external_api_id, t.id]) ?? []
+    );
+
+    // 3. Obtener partidos y estructurar el bloque
     const matchesResponse = await getCompetitionMatches();
+    const matchesToUpsert = [];
+
     for (const apiMatch of matchesResponse.matches) {
       const normalized = normalizeFootballDataMatch(apiMatch);
+      const homeTeamId = normalized.homeTeamExternalId ? teamIdMap.get(normalized.homeTeamExternalId) : null;
+      const awayTeamId = normalized.awayTeamExternalId ? teamIdMap.get(normalized.awayTeamExternalId) : null;
 
-      // Resolver IDs de equipos en la DB
-      let homeTeamId: string | null = null;
-      let awayTeamId: string | null = null;
+      matchesToUpsert.push({
+        external_api_id: normalized.externalApiId,
+        competition_id: normalized.competitionId,
+        competition_code: normalized.competitionCode,
+        competition_name: normalized.competitionName,
+        season_id: normalized.seasonId,
+        season_year: normalized.seasonYear,
+        utc_date: normalized.utcDate,
+        kickoff_time: normalized.kickoffTime,
+        status: normalized.status,
+        matchday: normalized.matchday,
+        stage: normalized.stage,
+        group_name: normalized.groupName,
+        home_team_id: homeTeamId ?? null,
+        away_team_id: awayTeamId ?? null,
+        home_team_name: normalized.homeTeamName,
+        away_team_name: normalized.awayTeamName,
+        home_team_crest: normalized.homeTeamCrest,
+        away_team_crest: normalized.awayTeamCrest,
+        home_score: normalized.homeScore,
+        away_score: normalized.awayScore,
+        winner: normalized.winner,
+        duration: normalized.duration,
+        last_updated_from_api: new Date().toISOString(),
+        raw_api_payload: normalized.rawApiPayload as any,
+      });
+    }
 
-      if (normalized.homeTeamExternalId) {
-        const { data } = await supabase()
-          .from('teams')
-          .select('id')
-          .eq('external_api_id', normalized.homeTeamExternalId)
-          .single();
-        homeTeamId = data?.id ?? null;
-      }
-
-      if (normalized.awayTeamExternalId) {
-        const { data } = await supabase()
-          .from('teams')
-          .select('id')
-          .eq('external_api_id', normalized.awayTeamExternalId)
-          .single();
-        awayTeamId = data?.id ?? null;
-      }
-
-      const { error } = await supabase()
+    // 4. Upsert masivo en una sola consulta a Supabase
+    if (matchesToUpsert.length > 0) {
+      const { error: upsertError } = await supabase()
         .from('matches')
-        .upsert(
-          {
-            external_api_id: normalized.externalApiId,
-            competition_id: normalized.competitionId,
-            competition_code: normalized.competitionCode,
-            competition_name: normalized.competitionName,
-            season_id: normalized.seasonId,
-            season_year: normalized.seasonYear,
-            utc_date: normalized.utcDate,
-            kickoff_time: normalized.kickoffTime,
-            status: normalized.status,
-            matchday: normalized.matchday,
-            stage: normalized.stage,
-            group_name: normalized.groupName,
-            home_team_id: homeTeamId,
-            away_team_id: awayTeamId,
-            home_team_name: normalized.homeTeamName,
-            away_team_name: normalized.awayTeamName,
-            home_team_crest: normalized.homeTeamCrest,
-            away_team_crest: normalized.awayTeamCrest,
-            home_score: normalized.homeScore,
-            away_score: normalized.awayScore,
-            winner: normalized.winner,
-            duration: normalized.duration,
-            last_updated_from_api: new Date().toISOString(),
-            raw_api_payload: normalized.rawApiPayload as any,
-          },
-          { onConflict: 'external_api_id' },
-        );
+        .upsert(matchesToUpsert, { onConflict: 'external_api_id' });
 
-      if (error) {
-        errors.push(`Match ${apiMatch.id}: ${error.message}`);
+      if (upsertError) {
+        errors.push(`Error en inserción masiva: ${upsertError.message}`);
       } else {
-        matchesSynced++;
+        matchesSynced = matchesToUpsert.length;
       }
     }
   } catch (err) {
