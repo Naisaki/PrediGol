@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ApiDelayNotice } from '@/components/common/api-delay-notice';
 import { getMatches } from '@/server/services/match.service';
+import { InteractiveBracketWrapper } from '@/components/world-cup/interactive-bracket-wrapper';
 import type { Match, MatchStage } from '@/types/app.types';
 import type { Metadata } from 'next';
 
@@ -40,9 +41,11 @@ export default async function WorldCupBracketPage() {
   // Ordenar los partidos dentro de cada fase por kickoff_time
   stagesOrder.forEach((stage) => {
     if (matchesByStage[stage]) {
-      matchesByStage[stage].sort(
-        (a, b) => new Date(a.kickoffTime).getTime() - new Date(b.kickoffTime).getTime(),
-      );
+      matchesByStage[stage].sort((a, b) => {
+        const aTime = a.kickoffTime || (a as any).kickoff_time || a.utcDate;
+        const bTime = b.kickoffTime || (b as any).kickoff_time || b.utcDate;
+        return new Date(aTime).getTime() - new Date(bTime).getTime();
+      });
     } else {
       matchesByStage[stage] = [];
     }
@@ -144,34 +147,36 @@ export default async function WorldCupBracketPage() {
             </Tabs>
           </div>
 
-          {/* Desktop view (Horizontal bracket layout) */}
-          <div className="hidden lg:block overflow-x-auto pb-6">
-            <div className="min-w-[1200px] flex gap-6 px-1">
-              {stagesOrder.map((stage) => {
-                const matches = matchesByStage[stage];
-                return (
-                  <div key={stage} className="flex-1 flex flex-col space-y-4">
-                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest text-center border-b border-border/30 pb-2">
-                      {getStageLongTitle(stage)}
-                    </h3>
+          {/* Desktop view (Horizontal bracket layout with zoom and drag) */}
+          <div className="hidden lg:block">
+            <InteractiveBracketWrapper>
+              <div className="min-w-[1400px] flex gap-8 px-4 py-8">
+                {stagesOrder.map((stage) => {
+                  const matches = matchesByStage[stage];
+                  return (
+                    <div key={stage} className="w-[260px] flex flex-col space-y-4">
+                      <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest text-center border-b border-border/30 pb-2">
+                        {getStageLongTitle(stage)}
+                      </h3>
 
-                    <div className="flex-1 flex flex-col justify-around py-4 space-y-6">
-                      {matches.length === 0 ? (
-                        <div className="p-4 bg-muted/5 border border-dashed border-border/30 rounded-xl text-center text-xs text-muted-foreground py-10">
-                          Por definir
-                        </div>
-                      ) : (
-                        matches.map((match) => (
-                          <div key={match.id} className="relative group">
-                            <BracketMatchCard match={match} />
+                      <div className="flex-1 flex flex-col justify-around py-4 space-y-6 min-h-[500px]">
+                        {matches.length === 0 ? (
+                          <div className="p-4 bg-muted/5 border border-dashed border-border/30 rounded-xl text-center text-xs text-muted-foreground py-10">
+                            Por definir
                           </div>
-                        ))
-                      )}
+                        ) : (
+                          matches.map((match) => (
+                            <div key={match.id} className="relative group w-full">
+                              <BracketMatchCard match={match} />
+                            </div>
+                          ))
+                        )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            </InteractiveBracketWrapper>
           </div>
         </>
       )}
@@ -181,15 +186,21 @@ export default async function WorldCupBracketPage() {
 
 // Sub-component for Bracket Match Card
 function BracketMatchCard({ match }: { match: Match }) {
-  const formattedTime = new Date(match.kickoffTime).toLocaleTimeString('es', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const matchTimeStr = match.kickoffTime || (match as any).kickoff_time || match.utcDate;
+  
+  const formattedTime = matchTimeStr
+    ? new Date(matchTimeStr).toLocaleTimeString('es', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : 'Por definir';
 
-  const formattedDate = new Date(match.kickoffTime).toLocaleDateString('es', {
-    day: 'numeric',
-    month: 'short',
-  });
+  const formattedDate = matchTimeStr
+    ? new Date(matchTimeStr).toLocaleDateString('es', {
+        day: 'numeric',
+        month: 'short',
+      })
+    : 'Por definir';
 
   const isLive = ['in_play', 'paused'].includes(match.status);
   const isFinished = match.status === 'finished';
