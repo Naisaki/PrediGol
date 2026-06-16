@@ -3,17 +3,156 @@
 // components/layout/breadcrumb-nav.tsx
 // =============================================================
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 interface BreadcrumbItem {
-  label: string;
+  labelKey: string;
   href?: string;
 }
 
+const breadcrumbTranslations: Record<string, Record<string, string>> = {
+  ES: {
+    Dashboard: 'Dashboard',
+    'Mis Grupos': 'Mis Grupos',
+    Partidos: 'Partidos',
+    'En Vivo': 'En Vivo',
+    Llaves: 'Llaves',
+    'Mi Perfil': 'Mi Perfil',
+    'Mis Pronósticos': 'Mis Pronósticos',
+    Ranking: 'Ranking',
+    Configuración: 'Configuración',
+    General: 'General',
+    Participantes: 'Participantes',
+    Invitaciones: 'Invitaciones',
+    'Reglas del juego': 'Reglas del juego',
+    Estadísticas: 'Estadísticas',
+    Transferencia: 'Transferencia',
+    'Zona de peligro': 'Zona de peligro',
+    'Nuevo grupo': 'Nuevo grupo',
+    'Detalle del grupo': 'Detalle del grupo',
+  },
+  EN: {
+    Dashboard: 'Dashboard',
+    'Mis Grupos': 'My Groups',
+    Partidos: 'Matches',
+    'En Vivo': 'Live',
+    Llaves: 'Bracket',
+    'Mi Perfil': 'My Profile',
+    'Mis Pronósticos': 'My Predictions',
+    Ranking: 'Ranking',
+    Configuración: 'Settings',
+    General: 'General',
+    Participantes: 'Participants',
+    Invitaciones: 'Invitations',
+    'Reglas del juego': 'Rules',
+    Estadísticas: 'Statistics',
+    Transferencia: 'Transfer',
+    'Zona de peligro': 'Danger Zone',
+    'Nuevo grupo': 'New Group',
+    'Detalle del grupo': 'Group Details',
+  },
+  FR: {
+    Dashboard: 'Tableau de bord',
+    'Mis Grupos': 'Mes Groupes',
+    Partidos: 'Matchs',
+    'En Vivo': 'En Direct',
+    Llaves: 'Tableau du Tournoi',
+    'Mi Perfil': 'Mon Profil',
+    'Mis Pronósticos': 'Mes Pronostics',
+    Ranking: 'Classement',
+    Configuración: 'Paramètres',
+    General: 'Général',
+    Participantes: 'Participants',
+    Invitaciones: 'Invitations',
+    'Reglas del juego': 'Règles du jeu',
+    Estadísticas: 'Statistiques',
+    Transferencia: 'Transfert',
+    'Zona de peligro': 'Zone de danger',
+    'Nuevo grupo': 'Nouveau groupe',
+    'Detalle del grupo': 'Détails du groupe',
+  },
+  IT: {
+    Dashboard: 'Dashboard',
+    'Mis Grupos': 'I Miei Gruppi',
+    Partidos: 'Partite',
+    'En Vivo': 'Dal Vivo',
+    Llaves: 'Tabellone del Torneo',
+    'Mi Perfil': 'Il Mio Profilo',
+    'Mis Pronósticos': 'I Miei Pronostici',
+    Ranking: 'Classifica',
+    Configuración: 'Impostazioni',
+    General: 'Generale',
+    Participantes: 'Partecipanti',
+    Invitaciones: 'Inviti',
+    'Reglas del juego': 'Regole del gioco',
+    Estadísticas: 'Statistiche',
+    Transferencia: 'Trasferimento',
+    'Zona di pericolo': 'Zona di pericolo',
+    'Nuevo grupo': 'Nuovo gruppo',
+    'Detalle del grupo': 'Dettagli del gruppo',
+  },
+  JA: {
+    Dashboard: 'ダッシュボード',
+    'Mis Grupos': 'マイグループ',
+    Partidos: '試合',
+    'En Vivo': 'ライブ',
+    Llaves: 'トーナメント表',
+    'Mi Perfil': 'マイプロフィール',
+    'Mis Pronósticos': '予想一覧',
+    Ranking: 'ランキング',
+    Configuración: '設定',
+    General: '一般',
+    Participantes: '参加者',
+    Invitaciones: '招待',
+    'Reglas del juego': 'ゲームのルール',
+    Estadísticas: '統計',
+    Transferencia: '移行',
+    'Zona de peligro': '危険エリア',
+    'Nuevo grupo': '新規グループ',
+    'Detalle del grupo': 'グループ詳細',
+  },
+  KO: {
+    Dashboard: '대시보드',
+    'Mis Grupos': '내 그룹',
+    Partidos: '경기',
+    'En Vivo': '라이브',
+    Llaves: '토너먼트 대진표',
+    'Mi Perfil': '내 프로필',
+    'Mis Pronósticos': '내 예측',
+    Ranking: '랭킹',
+    Configuración: '설정',
+    General: '일반',
+    Participantes: '참가자',
+    Invitaciones: '초대',
+    'Reglas del juego': '게임 규칙',
+    Estadísticas: '통계',
+    Transferencia: '이전',
+    'Zona de peligro': '위험 구역',
+    'Nuevo grupo': '새 그룹',
+    'Detalle del grupo': '그룹 상세 정보',
+  },
+};
+
 export function BreadcrumbNav() {
   const pathname = usePathname();
+  const [lang, setLang] = useState('ES');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('locale') || 'ES';
+    setLang(saved);
+
+    const handleLocaleChange = () => {
+      setLang(localStorage.getItem('locale') || 'ES');
+    };
+    window.addEventListener('locale-changed', handleLocaleChange);
+    return () => window.removeEventListener('locale-changed', handleLocaleChange);
+  }, []);
+
+  const t = (key: string) => {
+    return breadcrumbTranslations[lang]?.[key] || breadcrumbTranslations['ES']?.[key] || key;
+  };
 
   // No renderizar en el dashboard/inicio para evitar redundancia
   if (pathname === '/dashboard') {
@@ -25,7 +164,7 @@ export function BreadcrumbNav() {
   const items: BreadcrumbItem[] = [];
 
   // Agregar siempre el botón de inicio/dashboard al inicio si procede
-  items.push({ label: 'Dashboard', href: '/dashboard' });
+  items.push({ labelKey: 'Dashboard', href: '/dashboard' });
 
   let currentPath = '';
 
@@ -35,47 +174,47 @@ export function BreadcrumbNav() {
 
     // Mapear segmentos dinámicos o estáticos a etiquetas amigables
     if (segment === 'groups') {
-      items.push({ label: 'Mis Grupos', href: '/groups' });
+      items.push({ labelKey: 'Mis Grupos', href: '/groups' });
     } else if (segment === 'matches') {
-      items.push({ label: 'Partidos', href: '/matches' });
+      items.push({ labelKey: 'Partidos', href: '/matches' });
     } else if (segment === 'live') {
-      items.push({ label: 'En Vivo', href: '/matches/live' });
+      items.push({ labelKey: 'En Vivo', href: '/matches/live' });
     } else if (segment === 'world-cup') {
       // Ignorar el segmento intermedio 'world-cup' para no duplicar niveles
       continue;
     } else if (segment === 'bracket') {
-      items.push({ label: 'Llaves', href: '/world-cup/bracket' });
+      items.push({ labelKey: 'Llaves', href: '/world-cup/bracket' });
     } else if (segment === 'profile') {
-      items.push({ label: 'Mi Perfil', href: '/profile' });
+      items.push({ labelKey: 'Mi Perfil', href: '/profile' });
     } else if (segment === 'predictions') {
-      items.push({ label: 'Mis Pronósticos' });
+      items.push({ labelKey: 'Mis Pronósticos' });
     } else if (segment === 'ranking') {
-      items.push({ label: 'Ranking' });
+      items.push({ labelKey: 'Ranking' });
     } else if (segment === 'settings') {
-      items.push({ label: 'Configuración' });
+      items.push({ labelKey: 'Configuración' });
     } else if (segment === 'general') {
-      items.push({ label: 'General' });
+      items.push({ labelKey: 'General' });
     } else if (segment === 'participants') {
-      items.push({ label: 'Participantes' });
+      items.push({ labelKey: 'Participantes' });
     } else if (segment === 'invitations') {
-      items.push({ label: 'Invitaciones' });
+      items.push({ labelKey: 'Invitaciones' });
     } else if (segment === 'scoring') {
-      items.push({ label: 'Reglas del juego' });
+      items.push({ labelKey: 'Reglas del juego' });
     } else if (segment === 'stats') {
-      items.push({ label: 'Estadísticas' });
+      items.push({ labelKey: 'Estadísticas' });
     } else if (segment === 'transfer') {
-      items.push({ label: 'Transferencia' });
+      items.push({ labelKey: 'Transferencia' });
     } else if (segment === 'danger') {
-      items.push({ label: 'Zona de peligro' });
+      items.push({ labelKey: 'Zona de peligro' });
     } else if (segment === 'create') {
-      items.push({ label: 'Nuevo grupo' });
+      items.push({ labelKey: 'Nuevo grupo' });
     } else if (segments[i - 1] === 'groups') {
       // Es un ID de grupo, ej: /groups/[id]
-      items.push({ label: 'Detalle del grupo', href: `/groups/${segment}` });
+      items.push({ labelKey: 'Detalle del grupo', href: `/groups/${segment}` });
     } else {
       // Fallback
       const capitalized = segment.charAt(0).toUpperCase() + segment.slice(1);
-      items.push({ label: capitalized });
+      items.push({ labelKey: capitalized });
     }
   }
 
@@ -131,7 +270,7 @@ export function BreadcrumbNav() {
                 ) : isLast ? (
                   <div className="flex items-center gap-1.5 text-[var(--text)]">
                     <span aria-current="page" className="text-sm leading-[100%] font-semibold">
-                      {item.label}
+                      {t(item.labelKey)}
                     </span>
                   </div>
                 ) : (
@@ -139,7 +278,7 @@ export function BreadcrumbNav() {
                     href={item.href || '#'}
                     className="text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
                   >
-                    {item.label}
+                    {t(item.labelKey)}
                   </Link>
                 )}
               </li>
