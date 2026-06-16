@@ -6,9 +6,18 @@ import { Button } from '@/components/ui/button';
 
 interface InteractiveBracketWrapperProps {
   children: React.ReactNode;
+  translations?: {
+    zoomIn?: string;
+    zoomOut?: string;
+    reset?: string;
+    dragToMove?: string;
+  };
 }
 
-export function InteractiveBracketWrapper({ children }: InteractiveBracketWrapperProps) {
+export function InteractiveBracketWrapper({ 
+  children,
+  translations 
+}: InteractiveBracketWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -96,7 +105,7 @@ export function InteractiveBracketWrapper({ children }: InteractiveBracketWrappe
           size="icon"
           className="h-8 w-8 text-muted-foreground hover:text-foreground"
           onClick={handleZoomIn}
-          title="Acercar"
+          title={translations?.zoomIn || "Acercar"}
         >
           <ZoomIn className="h-4 w-4" />
         </Button>
@@ -105,7 +114,7 @@ export function InteractiveBracketWrapper({ children }: InteractiveBracketWrappe
           size="icon"
           className="h-8 w-8 text-muted-foreground hover:text-foreground"
           onClick={handleZoomOut}
-          title="Alejar"
+          title={translations?.zoomOut || "Alejar"}
         >
           <ZoomOut className="h-4 w-4" />
         </Button>
@@ -114,14 +123,14 @@ export function InteractiveBracketWrapper({ children }: InteractiveBracketWrappe
           size="icon"
           className="h-8 w-8 text-muted-foreground hover:text-foreground"
           onClick={resetZoom}
-          title="Restablecer vista"
+          title={translations?.reset || "Restablecer vista"}
         >
           <Maximize2 className="h-4 w-4" />
         </Button>
         <div className="h-4 w-[1px] bg-border/40 mx-1" />
         <div className="flex items-center gap-1 px-1 text-[10px] text-muted-foreground font-medium">
           <Move className="h-3.5 w-3.5" />
-          <span>Arrastrar para mover</span>
+          <span>{translations?.dragToMove || "Arrastrar para mover"}</span>
         </div>
       </div>
 
