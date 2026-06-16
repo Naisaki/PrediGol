@@ -21,6 +21,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { logoutAction } from '@/server/actions/auth';
 import { cn } from '@/lib/utils/cn';
+import { ThemeToggle } from '@/components/common/theme-toggle';
 
 const navItems = [
   { href: '/dashboard', label: 'Inicio', icon: LayoutDashboard },
@@ -43,13 +44,17 @@ export function SidebarNav({ username, avatarUrl }: SidebarNavProps) {
 
   return (
     <div className="flex flex-col h-full p-4">
-      {/* Logo */}
-      <Link href="/dashboard" className="flex items-center gap-2 mb-8 px-2">
-        <Trophy className="h-6 w-6 text-primary" />
-        <span className="font-bold text-base tracking-tight">
-          Mundial Predictor
-        </span>
-      </Link>
+      {/* Logo y Theme Toggle */}
+      <div className="flex items-center justify-between mb-8 px-2">
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <Trophy className="h-6 w-6 text-primary" />
+          <span className="font-bold text-base tracking-tight">
+            Mundial Predictor
+          </span>
+        </Link>
+        <ThemeToggle />
+      </div>
+
 
       {/* Nav items */}
       <nav className="flex-1 space-y-1">

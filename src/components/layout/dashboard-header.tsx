@@ -4,9 +4,10 @@
 // Header móvil del dashboard
 // =============================================================
 
-import { Trophy, Bell } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ThemeToggle } from '@/components/common/theme-toggle';
 
 interface DashboardHeaderProps {
   username: string;
@@ -21,7 +22,8 @@ export function DashboardHeader({ username, avatarUrl }: DashboardHeaderProps) {
         <span className="font-bold tracking-tight text-sm">Mundial Predictor</span>
       </Link>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
         <Link href="/profile">
           <Avatar className="h-8 w-8 border border-border/60">
             <AvatarImage src={avatarUrl ?? ''} alt={username} />
@@ -34,3 +36,4 @@ export function DashboardHeader({ username, avatarUrl }: DashboardHeaderProps) {
     </header>
   );
 }
+
