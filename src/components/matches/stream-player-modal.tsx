@@ -63,7 +63,7 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-4xl w-full bg-slate-950 border-border/40 p-0 overflow-hidden shadow-2xl rounded-2xl">
+        <DialogContent showCloseButton={false} className="sm:max-w-4xl w-full bg-slate-950 border-border/40 p-0 overflow-hidden shadow-2xl rounded-2xl">
           {/* Header */}
           <DialogHeader className="p-4 bg-slate-900 border-b border-border/20 flex flex-row items-center justify-between gap-4">
             <div className="flex-1 min-w-0">
