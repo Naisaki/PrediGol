@@ -9,6 +9,7 @@ import { SidebarNav } from '@/components/layout/sidebar-nav';
 import { MobileNav } from '@/components/layout/mobile-nav';
 import { DashboardHeader } from '@/components/layout/dashboard-header';
 import { BreadcrumbNav } from '@/components/layout/breadcrumb-nav';
+import { DashboardTransitionWrapper } from '@/components/layout/dashboard-transition-wrapper';
 
 export default async function DashboardLayout({
   children,
@@ -51,7 +52,9 @@ export default async function DashboardLayout({
         {/* Main content */}
         <main className="flex-1 p-4 lg:p-6 pb-24 lg:pb-6 max-w-7xl w-full">
           <BreadcrumbNav />
-          {children}
+          <DashboardTransitionWrapper>
+            {children}
+          </DashboardTransitionWrapper>
         </main>
       </div>
 
