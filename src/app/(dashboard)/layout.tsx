@@ -5,11 +5,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { SidebarNav } from '@/components/layout/sidebar-nav';
-import { MobileNav } from '@/components/layout/mobile-nav';
-import { DashboardHeader } from '@/components/layout/dashboard-header';
-import { BreadcrumbNav } from '@/components/layout/breadcrumb-nav';
-import { DashboardTransitionWrapper } from '@/components/layout/dashboard-transition-wrapper';
+import { DashboardShellClient } from '@/components/layout/dashboard-shell-client';
 
 export default async function DashboardLayout({
   children,
@@ -33,33 +29,11 @@ export default async function DashboardLayout({
     .maybeSingle();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header móvil */}
-      <DashboardHeader
-        username={profile?.username ?? 'Usuario'}
-        avatarUrl={profile?.avatar_url ?? null}
-      />
-
-      <div className="flex flex-1">
-        {/* Sidebar desktop */}
-        <aside className="hidden lg:flex flex-col w-64 border-r border-border/40 bg-card/30 min-h-screen sticky top-0 h-screen">
-          <SidebarNav
-            username={profile?.username ?? 'Usuario'}
-            avatarUrl={profile?.avatar_url ?? null}
-          />
-        </aside>
-
-        {/* Main content */}
-        <main className="flex-1 p-4 lg:p-6 pb-24 lg:pb-6 max-w-7xl w-full">
-          <BreadcrumbNav />
-          <DashboardTransitionWrapper>
-            {children}
-          </DashboardTransitionWrapper>
-        </main>
-      </div>
-
-      {/* Bottom nav móvil */}
-      <MobileNav />
-    </div>
+    <DashboardShellClient
+      username={profile?.username ?? 'Usuario'}
+      avatarUrl={profile?.avatar_url ?? null}
+    >
+      {children}
+    </DashboardShellClient>
   );
 }

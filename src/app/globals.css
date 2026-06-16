@@ -13,6 +13,14 @@
   --background: 210 20% 98%;
   --foreground: 222 47% 11%;
 
+  /* -- Variables personalizadas del sidebar / diseño (Modo Claro) -- */
+  --surface: #fff;
+  --surface-hover: #f3f3f3;
+  --text: #111827;
+  --text-muted: #6d6e6e;
+  --border-subtle: #f5f7f8;
+  --primaryColor: #2c2c2c;
+
   /* -- Cards y superficies -- */
   --card: 0 0% 100%;
   --card-foreground: 222 47% 11%;
@@ -62,6 +70,14 @@
   /* -- Colores base (Modo Oscuro) -- */
   --background: 222 47% 5%;
   --foreground: 210 40% 96%;
+
+  /* -- Variables personalizadas del sidebar / diseño (Modo Oscuro) -- */
+  --surface: hsl(222 40% 8%);
+  --surface-hover: hsl(217 33% 14%);
+  --text: hsl(210 40% 96%);
+  --text-muted: hsl(215 20% 65%);
+  --border-subtle: hsl(217 33% 12%);
+  --primaryColor: hsl(142 72% 44%);
 
   /* -- Cards y superficies -- */
   --card: 222 40% 8%;
@@ -120,7 +136,7 @@ html {
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans);
   font-feature-settings: 'rlig' 1, 'calt' 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -186,6 +202,7 @@ body {
   background: rgba(20, 26, 50, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
+
 
 
 /* ============================================================
@@ -354,6 +371,7 @@ body {
    ============================================================ */
 
 @theme inline {
+  --font-sans: var(--font-dm-sans), sans-serif;
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
   --color-card: hsl(var(--card));
@@ -374,4 +392,15 @@ body {
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* ============================================================
+   Utility: Ocultar barra de scroll
+   ============================================================ */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

@@ -1,9 +1,11 @@
 'use client';
+// =============================================================
+// components/layout/breadcrumb-nav.tsx
+// =============================================================
 
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
 
 interface BreadcrumbItem {
   label: string;
@@ -23,7 +25,7 @@ export function BreadcrumbNav() {
   const items: BreadcrumbItem[] = [];
 
   // Agregar siempre el botón de inicio/dashboard al inicio si procede
-  items.push({ label: 'INICIO', href: '/dashboard' });
+  items.push({ label: 'Dashboard', href: '/dashboard' });
 
   let currentPath = '';
 
@@ -33,90 +35,118 @@ export function BreadcrumbNav() {
 
     // Mapear segmentos dinámicos o estáticos a etiquetas amigables
     if (segment === 'groups') {
-      items.push({ label: 'MIS GRUPOS', href: '/groups' });
+      items.push({ label: 'Mis Grupos', href: '/groups' });
     } else if (segment === 'matches') {
-      items.push({ label: 'PARTIDOS', href: '/matches' });
+      items.push({ label: 'Partidos', href: '/matches' });
     } else if (segment === 'live') {
-      items.push({ label: 'EN VIVO', href: '/matches/live' });
+      items.push({ label: 'En Vivo', href: '/matches/live' });
     } else if (segment === 'world-cup') {
       // Ignorar el segmento intermedio 'world-cup' para no duplicar niveles
       continue;
     } else if (segment === 'bracket') {
-      items.push({ label: 'LLAVES', href: '/world-cup/bracket' });
+      items.push({ label: 'Llaves', href: '/world-cup/bracket' });
     } else if (segment === 'profile') {
-      items.push({ label: 'MI PERFIL', href: '/profile' });
+      items.push({ label: 'Mi Perfil', href: '/profile' });
     } else if (segment === 'predictions') {
-      items.push({ label: 'MIS PRONÓSTICOS' });
+      items.push({ label: 'Mis Pronósticos' });
     } else if (segment === 'ranking') {
-      items.push({ label: 'RANKING' });
+      items.push({ label: 'Ranking' });
     } else if (segment === 'settings') {
-      items.push({ label: 'CONFIGURACIÓN' });
+      items.push({ label: 'Configuración' });
     } else if (segment === 'general') {
-      items.push({ label: 'GENERAL' });
+      items.push({ label: 'General' });
     } else if (segment === 'participants') {
-      items.push({ label: 'PARTICIPANTES' });
+      items.push({ label: 'Participantes' });
     } else if (segment === 'invitations') {
-      items.push({ label: 'INVITACIONES' });
+      items.push({ label: 'Invitaciones' });
     } else if (segment === 'scoring') {
-      items.push({ label: 'REGLAS DEL JUEGO' });
+      items.push({ label: 'Reglas del juego' });
     } else if (segment === 'stats') {
-      items.push({ label: 'ESTADÍSTICAS' });
+      items.push({ label: 'Estadísticas' });
     } else if (segment === 'transfer') {
-      items.push({ label: 'TRANSFERENCIA' });
+      items.push({ label: 'Transferencia' });
     } else if (segment === 'danger') {
-      items.push({ label: 'ZONA DE PELIGRO' });
+      items.push({ label: 'Zona de peligro' });
     } else if (segment === 'create') {
-      items.push({ label: 'NUEVO GRUPO' });
+      items.push({ label: 'Nuevo grupo' });
     } else if (segments[i - 1] === 'groups') {
       // Es un ID de grupo, ej: /groups/[id]
-      items.push({ label: 'DETALLE DEL GRUPO', href: `/groups/${segment}` });
+      items.push({ label: 'Detalle del grupo', href: `/groups/${segment}` });
     } else {
       // Fallback
-      items.push({ label: segment.toUpperCase() });
+      const capitalized = segment.charAt(0).toUpperCase() + segment.slice(1);
+      items.push({ label: capitalized });
     }
   }
 
-  // Si no hay items suficientes más allá del dashboard, no renderizar
-  if (items.length <= 1) {
-    return null;
-  }
-
-  // Determinar link de retorno (el penúltimo elemento)
-  const backItem = items[items.length - 2];
-
   return (
-    <div className="flex items-center gap-2 text-xs font-semibold tracking-wider text-muted-foreground mb-4 select-none">
-      {backItem?.href && (
-        <Link
-          href={backItem.href}
-          className="inline-flex items-center gap-1 hover:text-foreground transition-colors group mr-1 text-primary"
-        >
-          <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-0.5 transition-transform" />
-          <span>VOLVER</span>
-        </Link>
-      )}
+    <nav aria-label="Breadcrumb" className="flex items-center gap-x-2 text-sm mb-5 select-none">
+      <ol className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        {items.map((item, index) => {
+          const isLast = index === items.length - 1;
 
-      {items.map((item, index) => {
-        const isLast = index === items.length - 1;
-        
-        return (
-          <React.Fragment key={index}>
-            {index > 0 && <span className="text-border/60 mx-1">/</span>}
-            {item.href && !isLast ? (
-              <Link
-                href={item.href}
-                className="hover:text-foreground text-muted-foreground/85 transition-colors uppercase font-bold"
-              >
-                {item.label}
-              </Link>
-            ) : (
-              <span className="text-foreground/90 uppercase font-bold">
-                {item.label}
-              </span>
-            )}
-          </React.Fragment>
-        );
-      })}
-    </div>
+          return (
+            <React.Fragment key={index}>
+              {index > 0 && (
+                <li className="flex items-center w-4 h-4 text-[var(--text-muted)]">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="block w-full h-full rtl:rotate-180"
+                  >
+                    <path d="M9 6l6 6l-6 6"></path>
+                  </svg>
+                </li>
+              )}
+
+              <li className="flex items-center">
+                {index === 0 ? (
+                  <Link
+                    href={item.href || '/dashboard'}
+                    className="flex items-center w-4 h-4 text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="block w-full h-full"
+                    >
+                      <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
+                      <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
+                      <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
+                    </svg>
+                    <span className="sr-only">Home</span>
+                  </Link>
+                ) : isLast ? (
+                  <div className="flex items-center gap-1.5 text-[var(--text)]">
+                    <span aria-current="page" className="text-sm leading-[100%] font-semibold">
+                      {item.label}
+                    </span>
+                  </div>
+                ) : (
+                  <Link
+                    href={item.href || '#'}
+                    className="text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                )}
+              </li>
+            </React.Fragment>
+          );
+        })}
+      </ol>
+    </nav>
   );
 }
