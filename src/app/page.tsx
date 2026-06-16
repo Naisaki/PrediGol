@@ -12,8 +12,16 @@ import {
   Hash,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect('/dashboard');
+  }
   return (
     <div className="min-h-screen gradient-hero">
       {/* Navbar */}
