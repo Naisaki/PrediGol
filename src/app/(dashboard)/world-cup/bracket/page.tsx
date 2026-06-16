@@ -115,73 +115,34 @@ export default async function WorldCupBracketPage() {
           </CardContent>
         </Card>
       ) : (
-        <>
-          {/* Mobile view (Vertical list by round selector) */}
-          <div className="block lg:hidden">
-            <Tabs defaultValue="ROUND_OF_16" className="w-full">
-              <TabsList className="grid grid-cols-5 bg-muted/20 border border-border/45 p-1 rounded-lg">
-                {stagesOrder.map((stage) => (
-                  <TabsTrigger
-                    key={stage}
-                    value={stage}
-                    className="text-[10px] sm:text-xs font-semibold py-1.5"
-                  >
-                    {getStageTitle(stage)}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-
-              {stagesOrder.map((stage) => (
-                <TabsContent key={stage} value={stage} className="mt-4 space-y-3">
-                  <h3 className="text-sm font-bold text-foreground mb-3 px-1">
+        <InteractiveBracketWrapper>
+          <div className="min-w-[1400px] flex gap-8 px-4 py-8">
+            {stagesOrder.map((stage) => {
+              const matches = matchesByStage[stage];
+              return (
+                <div key={stage} className="w-[260px] flex flex-col space-y-4">
+                  <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest text-center border-b border-border/30 pb-2">
                     {getStageLongTitle(stage)}
                   </h3>
-                  {matchesByStage[stage].length === 0 ? (
-                    <div className="text-center py-10 bg-muted/10 border border-border/30 rounded-lg text-xs text-muted-foreground">
-                      Partidos por definir
-                    </div>
-                  ) : (
-                    matchesByStage[stage].map((match) => (
-                      <BracketMatchCard key={match.id} match={match} />
-                    ))
-                  )}
-                </TabsContent>
-              ))}
-            </Tabs>
-          </div>
 
-          {/* Desktop view (Horizontal bracket layout with zoom and drag) */}
-          <div className="hidden lg:block">
-            <InteractiveBracketWrapper>
-              <div className="min-w-[1400px] flex gap-8 px-4 py-8">
-                {stagesOrder.map((stage) => {
-                  const matches = matchesByStage[stage];
-                  return (
-                    <div key={stage} className="w-[260px] flex flex-col space-y-4">
-                      <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest text-center border-b border-border/30 pb-2">
-                        {getStageLongTitle(stage)}
-                      </h3>
-
-                      <div className="flex-1 flex flex-col justify-around py-4 space-y-6 min-h-[500px]">
-                        {matches.length === 0 ? (
-                          <div className="p-4 bg-muted/5 border border-dashed border-border/30 rounded-xl text-center text-xs text-muted-foreground py-10">
-                            Por definir
-                          </div>
-                        ) : (
-                          matches.map((match) => (
-                            <div key={match.id} className="relative group w-full">
-                              <BracketMatchCard match={match} />
-                            </div>
-                          ))
-                        )}
+                  <div className="flex-1 flex flex-col justify-around py-4 space-y-6 min-h-[500px]">
+                    {matches.length === 0 ? (
+                      <div className="p-4 bg-muted/5 border border-dashed border-border/30 rounded-xl text-center text-xs text-muted-foreground py-10">
+                        Por definir
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </InteractiveBracketWrapper>
+                    ) : (
+                      matches.map((match) => (
+                        <div key={match.id} className="relative group w-full">
+                          <BracketMatchCard match={match} />
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        </>
+        </InteractiveBracketWrapper>
       )}
     </div>
   );

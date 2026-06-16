@@ -64,6 +64,29 @@ export function InteractiveBracketWrapper({ children }: InteractiveBracketWrappe
     setIsDragging(false);
   };
 
+  // Eventos Táctiles (Móviles / Tablets)
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if ((e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('a')) {
+      return;
+    }
+    const touch = e.touches[0];
+    setIsDragging(true);
+    setDragStart({ x: touch.clientX - position.x, y: touch.clientY - position.y });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    const touch = e.touches[0];
+    setPosition({
+      x: touch.clientX - dragStart.x,
+      y: touch.clientY - dragStart.y,
+    });
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
   return (
     <div className="relative w-full border border-border/30 rounded-2xl bg-slate-950/20 overflow-hidden min-h-[620px] select-none">
       {/* Panel de Controles Flotante */}
@@ -112,6 +135,9 @@ export function InteractiveBracketWrapper({ children }: InteractiveBracketWrappe
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         <div
           ref={contentRef}
