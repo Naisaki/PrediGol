@@ -4,13 +4,15 @@
 // =============================================================
 
 import { createClient } from '@/lib/supabase/server';
-import { Radio, Clock, RefreshCw } from 'lucide-react';
+import { Radio, Clock, RefreshCw, Tv } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ApiDelayNotice } from '@/components/common/api-delay-notice';
 import { LocalTime } from '@/components/common/local-time';
 import { StreamPlayerModal } from '@/components/matches/stream-player-modal';
 import { cn } from '@/lib/utils/cn';
 import type { Metadata } from 'next';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = { title: 'Partidos En Vivo' };
 export const revalidate = 10; // Revalidar cada 10 segundos en vivo
@@ -58,7 +60,7 @@ export default async function LiveMatchesPage() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <span className="relative flex h-3 w-3 mr-1">
@@ -71,12 +73,20 @@ export default async function LiveMatchesPage() {
             Resultados y estado de los partidos en tiempo real
           </p>
         </div>
-        {lastSyncTime && (
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <RefreshCw className="h-3 w-3 animate-spin-slow" />
-            Actualizado {lastSyncTime}
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          <Link href="/matches/streams">
+            <Button variant="outline" size="sm" className="gap-2 border-primary/20 hover:bg-primary/5 hover:text-primary">
+              <Tv className="h-4 w-4" />
+              <span>Ver Canales de TV</span>
+            </Button>
+          </Link>
+          {lastSyncTime && (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <RefreshCw className="h-3 w-3 animate-spin-slow" />
+              Actualizado {lastSyncTime}
+            </div>
+          )}
+        </div>
       </div>
 
       <ApiDelayNotice />
@@ -89,9 +99,15 @@ export default async function LiveMatchesPage() {
             <p className="text-muted-foreground font-medium mb-1">
               No hay partidos jugándose en este momento
             </p>
-            <p className="text-xs text-muted-foreground/60">
+            <p className="text-xs text-muted-foreground/60 mb-6">
               Cuando inicien los partidos programados para hoy, los verás listados aquí en vivo.
             </p>
+            <Link href="/matches/streams">
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold gap-2">
+                <Tv className="h-4 w-4" />
+                Explorar Canales de Transmisión
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       ) : (
