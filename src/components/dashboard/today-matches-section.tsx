@@ -274,7 +274,7 @@ export function TodayMatchesSection({ groups, windowMatches }: TodayMatchesSecti
                 onDrop={(e) => handleDrop(e, index)}
                 onDragEnd={handleDragEnd}
                 onClick={() => handleCardClick(cardContent.href)}
-                className={`relative flex flex-col justify-between w-full p-4 rounded-2xl bg-[var(--surface)] border border-border/40 overflow-hidden select-none min-h-[110px] cursor-pointer ${
+                className={`bg-[var(--surface)] py-4 px-4 rounded-2xl border border-transparent dark:border-[var(--border-subtle)] h-full select-none min-h-[110px] w-full flex flex-col justify-between relative overflow-hidden cursor-pointer ${
                   isDraggingActive ? 'transition-none' : 'transition-all duration-300'
                 } ${
                   isHovered ? 'scale-[1.02] shadow-lg shadow-primary/5 border-primary/30' : ''
@@ -283,12 +283,26 @@ export function TodayMatchesSection({ groups, windowMatches }: TodayMatchesSecti
                 }`}
               >
                 {/* Dots background pattern */}
-                <div className="dashboard-card-pattern dots-pattern" />
+                <div 
+                  className="absolute -inset-[400px] pointer-events-none dots-pattern" 
+                  style={{
+                    opacity: 0.8,
+                    transform: 'rotate(40deg)',
+                    backgroundSize: '5px 5px',
+                    '--dot-size': '3px',
+                    '--light-dot-color': 'rgba(255, 255, 255, 0.25)',
+                    '--dark-dot-color': 'rgba(0, 0, 0, 0.4)'
+                  } as React.CSSProperties}
+                />
                 
-                {/* Glow effect on hover */}
-                {isHovered && (
-                  <div className="absolute inset-0 pointer-events-none z-20 bg-[radial-gradient(600px_300px_at_0%_0%,rgba(var(--primary),0.06)_0%,rgba(var(--primary),0)_40%,transparent_80%)] dark:bg-[radial-gradient(600px_300px_at_0%_0%,rgba(255,255,255,0.02)_0%,rgba(255,255,255,0)_40%,transparent_80%)]" />
-                )}
+                {/* Glow effect */}
+                <div 
+                  className="absolute inset-0 pointer-events-none" 
+                  style={{ 
+                    zIndex: 20, 
+                    background: 'radial-gradient(1200px 600px at 0% 0%, rgba(205, 205, 205, 0.09) 0%, rgba(205, 205, 205, 0) 30%, transparent 70%)' 
+                  }} 
+                />
 
                 {/* Header */}
                 <div className="flex items-center justify-between relative z-10">
@@ -335,7 +349,7 @@ export function TodayMatchesSection({ groups, windowMatches }: TodayMatchesSecti
 
                 {/* Footer */}
                 <div className="flex items-baseline justify-between relative z-10 mt-4">
-                  <div className="text-base font-bold text-[var(--text)] leading-tight">
+                  <div className="text-lg xs:text-xl font-bold text-[var(--text)] leading-tight">
                     {cardContent.value}
                   </div>
                   <div className={`flex items-center gap-1 text-xs font-semibold ${

@@ -421,20 +421,9 @@ body {
 }
 
 .dots-pattern {
-  background-image: radial-gradient(
-    var(--dot-color) 1.2px,
-    transparent 1.2px
-  );
-  background-size: 8px 8px;
+  background-image: radial-gradient(circle, var(--light-dot-color) var(--dot-size), transparent var(--dot-size));
 }
 
-.dashboard-card-pattern {
-  position: absolute;
-  top: -100rem;
-  right: -100rem;
-  bottom: -100rem;
-  left: -100rem;
-  pointer-events: none;
-  opacity: 0.8;
-  transform: rotate(40deg);
+.dark .dots-pattern {
+  background-image: radial-gradient(circle, var(--dark-dot-color) var(--dot-size), transparent var(--dot-size));
 }
