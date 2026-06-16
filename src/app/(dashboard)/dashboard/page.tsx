@@ -145,15 +145,32 @@ export default async function DashboardPage() {
               </div>
             ) : (
               <>
-                {groups.slice(0, 3).map((group: unknown) => {
-                  const g = group as { id: string; name: string };
+                {groups.slice(0, 3).map((g) => {
+                  const initials = g.name
+                    .split(' ')
+                    .map((word) => word[0])
+                    .join('')
+                    .substring(0, 2)
+                    .toUpperCase();
+
                   return (
                     <Link key={g.id} href={`/groups/${g.id}`}>
                       <div className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/30 transition-colors">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
-                            <Users className="h-4 w-4 text-primary" />
-                          </div>
+                          {g.imageUrl ? (
+                            <div className="w-8 h-8 rounded-full overflow-hidden border border-border/60 flex-shrink-0">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={g.imageUrl}
+                                alt={g.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-violet-500/20 border border-primary/20 flex items-center justify-center font-bold text-xs text-primary tracking-wider flex-shrink-0">
+                              {initials}
+                            </div>
+                          )}
                           <span className="text-sm font-medium">{g.name}</span>
                         </div>
                         <ChevronRight className="h-4 w-4 text-muted-foreground" />
