@@ -118,47 +118,57 @@ export function TodayMatchesSection({ groupsCount, windowMatches, groupsListMark
                 </p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {todayMatches.map((match) => {
                   const hasScore = match.home_score !== null && match.away_score !== null;
                   return (
                     <div
                       key={match.id}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/20 transition-colors"
+                      className="flex items-center justify-between p-3.5 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors border border-border/10"
                     >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        {match.home_team_crest && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={match.home_team_crest}
-                            alt={match.home_team_name}
-                            className="team-flag w-6 h-4 flex-shrink-0"
-                          />
-                        )}
-                        <span className="text-xs font-semibold truncate max-w-[80px] sm:max-w-none">
-                          {match.home_team_name}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground flex-shrink-0">vs</span>
-                        {match.away_team_crest && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={match.away_team_crest}
-                            alt={match.away_team_name}
-                            className="team-flag w-6 h-4 flex-shrink-0"
-                          />
-                        )}
-                        <span className="text-xs font-semibold truncate max-w-[80px] sm:max-w-none">
-                          {match.away_team_name}
-                        </span>
+                      <div className="flex items-center gap-3 text-sm">
+                        {/* Home Team Flag */}
+                        <div className="flex items-center gap-1.5">
+                          {match.home_team_crest ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={match.home_team_crest}
+                              alt={match.home_team_name ?? 'TBD'}
+                              className="w-4 h-4 object-contain"
+                            />
+                          ) : (
+                            <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center text-[7px] font-bold">
+                              H
+                            </div>
+                          )}
+                          <span className="font-medium text-foreground">{match.home_team_name ?? 'TBD'}</span>
+                        </div>
+
+                        <span className="text-muted-foreground font-semibold text-xs">vs</span>
+
+                        {/* Away Team Flag */}
+                        <div className="flex items-center gap-1.5">
+                          {match.away_team_crest ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={match.away_team_crest}
+                              alt={match.away_team_name ?? 'TBD'}
+                              className="w-4 h-4 object-contain"
+                            />
+                          ) : (
+                            <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center text-[7px] font-bold">
+                              A
+                            </div>
+                          )}
+                          <span className="font-medium text-foreground">{match.away_team_name ?? 'TBD'}</span>
+                        </div>
                       </div>
                       
-                      <div className="text-xs font-bold text-primary ml-2 flex-shrink-0">
+                      <div className="text-xs font-semibold text-primary">
                         {match.status === 'in_play' || match.status === 'paused' ? (
-                          <span className="text-red-500 animate-pulse">En vivo</span>
+                          <span className="text-red-500 animate-pulse font-bold">En vivo</span>
                         ) : hasScore ? (
-                          <span className="text-muted-foreground">
-                            {match.home_score} - {match.away_score}
-                          </span>
+                          <span className="text-foreground font-bold">{match.home_score} - {match.away_score}</span>
                         ) : (
                           <LocalTime utcDate={match.kickoff_time} />
                         )}
