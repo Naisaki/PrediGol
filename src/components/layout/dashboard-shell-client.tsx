@@ -36,7 +36,7 @@ export function DashboardShellClient({
   };
 
   return (
-    <div className="flex flex-col gap-3 h-dvh w-screen overflow-hidden p-3 bg-[var(--background)]">
+    <div className="flex flex-col gap-3 min-h-screen lg:h-dvh w-screen lg:overflow-hidden p-3 bg-[var(--background)]">
       {/* Top Navbar (Fijo arriba en el contenedor flex) */}
       <DashboardNavbar
         username={username}
@@ -45,8 +45,8 @@ export function DashboardShellClient({
         setCollapsed={handleSetCollapsed}
       />
 
-      {/* Main Wrapper (Toma la altura restante, previene desbordamiento) */}
-      <div className="relative flex flex-row flex-1 min-h-0 gap-3 overflow-hidden">
+      {/* Main Wrapper (Toma la altura restante en desktop, permite expandirse en móvil) */}
+      <div className="relative flex flex-row flex-1 min-h-0 gap-3 overflow-visible lg:overflow-hidden">
         {/* Sidebar (Fijo a la izquierda) */}
         <SidebarNav
           username={username}
@@ -55,8 +55,8 @@ export function DashboardShellClient({
           setCollapsed={handleSetCollapsed}
         />
 
-        {/* Content Area (Único contenedor con scroll vertical de la página, sin bordes ni fondo, y sin scrollbar visible) */}
-        <main className="flex flex-col flex-grow shrink basis-0 w-full overflow-y-auto no-scrollbar p-4 lg:p-6 pb-24 lg:pb-6 transition-all duration-300 h-full">
+        {/* Content Area (Scroll a nivel de página en móvil, local en desktop) */}
+        <main className="flex flex-col flex-grow shrink basis-0 w-full overflow-visible lg:overflow-y-auto no-scrollbar p-4 lg:p-6 pb-24 lg:pb-6 transition-all duration-300 min-h-0 lg:h-full">
           <BreadcrumbNav />
           <DashboardTransitionWrapper>{children}</DashboardTransitionWrapper>
         </main>
