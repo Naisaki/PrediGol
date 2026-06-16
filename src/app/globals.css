@@ -10,8 +10,8 @@
 
 :root {
   /* -- Colores base (Modo Claro) -- */
-  --background: 210 20% 98%;
-  --foreground: 222 47% 11%;
+  --background: 200 10% 97%; /* #f5f7f8 equivalent */
+  --foreground: 220 15% 10%; /* #111827 equivalent */
 
   /* -- Variables personalizadas del sidebar / diseño (Modo Claro) -- */
   --surface: #fff;
@@ -23,9 +23,9 @@
 
   /* -- Cards y superficies -- */
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
+  --card-foreground: 220 15% 10%;
   --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
+  --popover-foreground: 220 15% 10%;
 
   /* -- Primario: Verde fútbol -- */
   --primary: 142 72% 38%;
@@ -33,23 +33,23 @@
 
   /* -- Secundario: Dorado trofeo -- */
   --secondary: 43 96% 48%;
-  --secondary-foreground: 222 47% 11%;
+  --secondary-foreground: 220 15% 10%;
 
   /* -- Muted -- */
-  --muted: 210 40% 95%;
-  --muted-foreground: 215.4 16.3% 44%;
+  --muted: 200 10% 95%;
+  --muted-foreground: 215 16% 44%;
 
-  /* -- Acento azul -- */
-  --accent: 221.2 83.2% 53.3%;
-  --accent-foreground: 0 0% 100%;
+  /* -- Acento -- */
+  --accent: 200 10% 95%;
+  --accent-foreground: 220 15% 10%;
 
   /* -- Destructivo -- */
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
 
   /* -- Bordes e inputs -- */
-  --border: 214.3 31.8% 90%;
-  --input: 214.3 31.8% 92%;
+  --border: 220 13% 91%; /* #e5e7eb equivalent */
+  --input: 220 13% 91%;
   --ring: 142 72% 38%;
 
   /* -- Radius -- */
@@ -68,22 +68,22 @@
 
 .dark {
   /* -- Colores base (Modo Oscuro) -- */
-  --background: 222 47% 5%;
-  --foreground: 210 40% 96%;
+  --background: 0 0% 4%; /* #0b0b0b equivalent */
+  --foreground: 0 0% 96%; /* #f5f5f5 equivalent */
 
   /* -- Variables personalizadas del sidebar / diseño (Modo Oscuro) -- */
-  --surface: hsl(222 40% 8%);
-  --surface-hover: hsl(217 33% 14%);
-  --text: hsl(210 40% 96%);
-  --text-muted: hsl(215 20% 65%);
-  --border-subtle: hsl(217 33% 12%);
-  --primaryColor: hsl(142 72% 44%);
+  --surface: #151515;
+  --surface-hover: #3c3d41;
+  --text: #fff;
+  --text-muted: #b3b4b5;
+  --border-subtle: #1a1a1a;
+  --primaryColor: #e5e5e5;
 
   /* -- Cards y superficies -- */
-  --card: 222 40% 8%;
-  --card-foreground: 210 40% 96%;
-  --popover: 222 40% 8%;
-  --popover-foreground: 210 40% 96%;
+  --card: 0 0% 8%; /* #151515 equivalent */
+  --card-foreground: 0 0% 96%;
+  --popover: 0 0% 8%;
+  --popover-foreground: 0 0% 96%;
 
   /* -- Primario: Verde fútbol -- */
   --primary: 142 72% 44%;
@@ -91,14 +91,14 @@
 
   /* -- Secundario: Dorado trofeo -- */
   --secondary: 43 96% 56%;
-  --secondary-foreground: 222 47% 5%;
+  --secondary-foreground: 0 0% 4%;
 
   /* -- Muted -- */
-  --muted: 217 33% 17%;
-  --muted-foreground: 215 20% 65%;
+  --muted: 0 0% 15%; /* #262626 equivalent */
+  --muted-foreground: 0 0% 70%;
 
-  /* -- Acento azul -- */
-  --accent: 221 83% 62%;
+  /* -- Acento -- */
+  --accent: 0 0% 15%;
   --accent-foreground: 0 0% 100%;
 
   /* -- Destructivo -- */
@@ -106,8 +106,8 @@
   --destructive-foreground: 0 0% 100%;
 
   /* -- Bordes e inputs -- */
-  --border: 217 33% 20%;
-  --input: 217 33% 14%;
+  --border: 0 0% 10%; /* #1a1a1a equivalent */
+  --input: 0 0% 15%;
   --ring: 142 72% 44%;
 
   /* -- Colores de estado de partido -- */
@@ -117,8 +117,8 @@
   --status-postponed: 0 72% 51%;
 
   /* -- Glassmorphism -- */
-  --glass-bg: rgba(15, 20, 40, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(21, 21, 21, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.06);
 }
 
 /* ============================================================
