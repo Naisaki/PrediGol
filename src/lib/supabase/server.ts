@@ -7,8 +7,9 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { SupabaseClient } from '@supabase/supabase-js';
 import type { FixedDatabase } from '@/types/database.types';
+import { cache } from 'react';
 
-export async function createClient() {
+export const createClient = cache(async () => {
   const cookieStore = await cookies();
 
   return createServerClient(
@@ -33,7 +34,7 @@ export async function createClient() {
       },
     },
   ) as unknown as SupabaseClient<FixedDatabase, 'public', 'public', FixedDatabase['public']>;
-}
+});
 
 // Cliente con service_role para operaciones admin (cron jobs, server actions privilegiadas)
 export function createServiceClient() {
