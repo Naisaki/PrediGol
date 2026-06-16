@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Users, Calendar, Target, Trophy, ChevronRight, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -124,9 +125,16 @@ const dashboardTranslations: Record<string, Record<string, string>> = {
 };
 
 export function TodayMatchesSection({ groups, windowMatches }: TodayMatchesSectionProps) {
+  const router = useRouter();
   const [todayMatches, setTodayMatches] = useState<Match[]>([]);
   const [mounted, setMounted] = useState(false);
   const [lang, setLang] = useState('ES');
+  
+  // Drag and drop logic
+  const [cardOrder, setCardOrder] = useState<string[]>([]);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [isDraggingActive, setIsDraggingActive] = useState(false);
+  const [hoveredGripIndex, setHoveredGripIndex] = useState<number | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -139,13 +147,27 @@ export function TodayMatchesSection({ groups, windowMatches }: TodayMatchesSecti
     setTodayMatches(filtered);
 
     // Cargar idioma
-    const saved = localStorage.getItem('locale') || 'ES';
-    setLang(saved);
+    const savedLocale = localStorage.getItem('locale') || 'ES';
+    setLang(savedLocale);
 
     const handleLocaleChange = () => {
       setLang(localStorage.getItem('locale') || 'ES');
     };
     window.addEventListener('locale-changed', handleLocaleChange);
+
+    // Cargar orden de tarjetas
+    const savedOrder = localStorage.getItem('dashboard-card-order');
+    if (savedOrder) {
+      try {
+        const parsed = JSON.parse(savedOrder);
+        if (Array.isArray(parsed) && parsed.length === 4) {
+          setCardOrder(parsed);
+          return () => window.removeEventListener('locale-changed', handleLocaleChange);
+        }
+      } catch (e) {}
+    }
+    setCardOrder(['groups', 'matches', 'results', 'bracket']);
+
     return () => window.removeEventListener('locale-changed', handleLocaleChange);
   }, [windowMatches]);
 
@@ -155,49 +177,194 @@ export function TodayMatchesSection({ groups, windowMatches }: TodayMatchesSecti
 
   const todayCount = mounted ? todayMatches.length : 0;
 
+  // Drag Handlers
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    if (hoveredGripIndex !== index) {
+      e.preventDefault();
+      return;
+    }
+    setIsDraggingActive(true);
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    const newOrder = [...cardOrder];
+    const draggedItem = newOrder[draggedIndex];
+    newOrder.splice(draggedIndex, 1);
+    newOrder.splice(index, 0, draggedItem);
+    
+    setCardOrder(newOrder);
+    localStorage.setItem('dashboard-card-order', JSON.stringify(newOrder));
+    setDraggedIndex(null);
+    setHoveredGripIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setHoveredGripIndex(null);
+    setTimeout(() => {
+      setIsDraggingActive(false);
+    }, 100);
+  };
+
+  const handleCardClick = (href: string) => {
+    if (isDraggingActive) return;
+    router.push(href);
+  };
+
   return (
     <div className="space-y-6">
-      {/* Quick stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Link href="/groups">
-          <Card className="glass-card border-border/40 hover:border-primary/30 transition-colors cursor-pointer group">
-            <CardContent className="p-4">
-              <Users className="h-5 w-5 mb-3 text-primary group-hover:scale-110 transition-transform" />
-              <div className="text-2xl font-bold mb-0.5">{groups.length}</div>
-              <div className="text-xs text-muted-foreground">{t('myGroupsStat')}</div>
-            </CardContent>
-          </Card>
-        </Link>
+      <div className="mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {cardOrder.map((cardKey, index) => {
+            const isHovered = hoveredGripIndex === index;
+            
+            // Find card configuration
+            let cardContent = null;
+            if (cardKey === 'groups') {
+              cardContent = {
+                title: t('myGroupsStat'),
+                value: groups.length,
+                href: '/groups',
+                icon: <Users className="w-5 h-5 text-primary" />,
+                trend: { text: '+1', isUp: true }
+              };
+            } else if (cardKey === 'matches') {
+              cardContent = {
+                title: t('matchesToday'),
+                value: todayCount,
+                href: '/matches',
+                icon: <Calendar className="w-5 h-5 text-secondary" />,
+                trend: { text: '+4', isUp: true }
+              };
+            } else if (cardKey === 'bracket') {
+              cardContent = {
+                title: t('bracket'),
+                value: '→',
+                href: '/world-cup/bracket',
+                icon: <Trophy className="w-5 h-5 text-yellow-500" />,
+                trend: { text: '+12%', isUp: true }
+              };
+            } else if (cardKey === 'results') {
+              cardContent = {
+                title: t('viewResults'),
+                value: '→',
+                href: '/matches',
+                icon: <Target className="w-5 h-5 text-emerald-500" />,
+                trend: { text: '→ 0%', isUp: false }
+              };
+            }
 
-        <Link href="/matches">
-          <Card className="glass-card border-border/40 hover:border-primary/30 transition-colors cursor-pointer group">
-            <CardContent className="p-4">
-              <Calendar className="h-5 w-5 mb-3 text-secondary group-hover:scale-110 transition-transform" />
-              <div className="text-2xl font-bold mb-0.5">{todayCount}</div>
-              <div className="text-xs text-muted-foreground">{t('matchesToday')}</div>
-            </CardContent>
-          </Card>
-        </Link>
+            if (!cardContent) return null;
 
-        <Link href="/matches">
-          <Card className="glass-card border-border/40 hover:border-primary/30 transition-colors cursor-pointer group">
-            <CardContent className="p-4">
-              <Target className="h-5 w-5 mb-3 text-accent group-hover:scale-110 transition-transform" />
-              <div className="text-2xl font-bold mb-0.5">→</div>
-              <div className="text-xs text-muted-foreground">{t('viewResults')}</div>
-            </CardContent>
-          </Card>
-        </Link>
+            return (
+              <div
+                key={cardKey}
+                draggable={hoveredGripIndex === index}
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
+                onClick={() => handleCardClick(cardContent.href)}
+                className={`relative flex flex-col justify-between w-full p-4 rounded-2xl bg-[var(--surface)] border border-border/40 overflow-hidden select-none min-h-[110px] cursor-pointer ${
+                  isDraggingActive ? 'transition-none' : 'transition-all duration-300'
+                } ${
+                  isHovered ? 'scale-[1.02] shadow-lg shadow-primary/5 border-primary/30' : ''
+                } ${
+                  draggedIndex === index ? 'opacity-40 border-primary/40' : ''
+                }`}
+              >
+                {/* Dots background pattern */}
+                <div className="dashboard-card-pattern dots-pattern" />
+                
+                {/* Glow effect on hover */}
+                {isHovered && (
+                  <div className="absolute inset-0 pointer-events-none z-20 bg-[radial-gradient(600px_300px_at_0%_0%,rgba(var(--primary),0.06)_0%,rgba(var(--primary),0)_40%,transparent_80%)] dark:bg-[radial-gradient(600px_300px_at_0%_0%,rgba(255,255,255,0.02)_0%,rgba(255,255,255,0)_40%,transparent_80%)]" />
+                )}
 
-        <Link href="/world-cup/bracket">
-          <Card className="glass-card border-border/40 hover:border-primary/30 transition-colors cursor-pointer group">
-            <CardContent className="p-4">
-              <Trophy className="h-5 w-5 mb-3 text-yellow-400 group-hover:scale-110 transition-transform" />
-              <div className="text-2xl font-bold mb-0.5">→</div>
-              <div className="text-xs text-muted-foreground">{t('bracket')}</div>
-            </CardContent>
-          </Card>
-        </Link>
+                {/* Header */}
+                <div className="flex items-center justify-between relative z-10">
+                  <div className="flex items-center gap-2">
+                    <div className="text-[var(--text-muted)] bg-[var(--surface-hover)] p-1.5 rounded-md flex items-center justify-center">
+                      {cardContent.icon}
+                    </div>
+                    <span className="text-xs font-semibold text-[var(--text-muted)] leading-tight">
+                      {cardContent.title}
+                    </span>
+                  </div>
+
+                  {/* Grip Icon for Drag & Hover Activation */}
+                  <div
+                    onMouseEnter={() => setHoveredGripIndex(index)}
+                    onMouseLeave={() => {
+                      if (draggedIndex === null) {
+                        setHoveredGripIndex(null);
+                      }
+                    }}
+                    className="opacity-30 hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing p-1 -m-1 z-30 select-none flex items-center justify-center text-[var(--text)]"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="w-3.5 h-3.5"
+                    >
+                      <path d="M5 9m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
+                      <path d="M5 15m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
+                      <path d="M12 9m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
+                      <path d="M12 15m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
+                      <path d="M19 9m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
+                      <path d="M19 15m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="flex items-baseline justify-between relative z-10 mt-4">
+                  <div className="text-base font-bold text-[var(--text)] leading-tight">
+                    {cardContent.value}
+                  </div>
+                  <div className={`flex items-center gap-1 text-xs font-semibold ${
+                    cardContent.trend.isUp ? 'text-emerald-500 dark:text-emerald-400' : 'text-zinc-500'
+                  }`}>
+                    {cardContent.trend.isUp ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="w-3 h-3"
+                      >
+                        <path d="m3 17 6-6 4 4 8-8" />
+                        <path d="M14 7h7v7" />
+                      </svg>
+                    ) : null}
+                    <span>{cardContent.trend.text}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Grid: Grupos + Partidos */}
