@@ -27,16 +27,6 @@ export default async function DashboardPage() {
 
   if (!user) return null;
 
-  // Datos del usuario
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('username, full_name')
-    .eq('user_id', user.id)
-    .maybeSingle();
-
-  // Grupos del usuario obtenidos con el servicio para asegurar datos frescos
-  const groups = await getUserGroups(user.id);
-
   // Obtener ventana de partidos (ayer, hoy, mañana) para filtrar en el cliente según su zona horaria
   const today = new Date();
   const startWindow = new Date(today);
@@ -47,12 +37,24 @@ export default async function DashboardPage() {
   endWindow.setDate(endWindow.getDate() + 1);
   endWindow.setHours(23, 59, 59, 999);
 
-  const { data: windowMatches } = await supabase
-    .from('matches')
-    .select('id, home_team_name, away_team_name, home_team_crest, away_team_crest, kickoff_time, status, home_score, away_score')
-    .gte('kickoff_time', startWindow.toISOString())
-    .lte('kickoff_time', endWindow.toISOString())
-    .order('kickoff_time');
+  // Ejecutamos las consultas en paralelo para acelerar el tiempo de carga del servidor
+  const [profileResult, groups, windowMatchesResult] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('username, full_name')
+      .eq('user_id', user.id)
+      .maybeSingle(),
+    getUserGroups(user.id),
+    supabase
+      .from('matches')
+      .select('id, home_team_name, away_team_name, home_team_crest, away_team_crest, kickoff_time, status, home_score, away_score')
+      .gte('kickoff_time', startWindow.toISOString())
+      .lte('kickoff_time', endWindow.toISOString())
+      .order('kickoff_time')
+  ]);
+
+  const profile = profileResult.data;
+  const windowMatches = windowMatchesResult.data;
 
   const firstName = profile?.full_name?.split(' ')[0] ?? profile?.username ?? 'Jugador';
 
