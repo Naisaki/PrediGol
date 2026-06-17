@@ -288,10 +288,10 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent showCloseButton={false} className="sm:max-w-4xl w-full bg-[var(--surface)] border-border/40 p-0 overflow-hidden shadow-2xl rounded-2xl">
-          <DialogHeader className="p-4 bg-[var(--surface-hover)] border-b border-[var(--border-subtle)] flex flex-row items-center justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <DialogTitle className="text-base font-bold text-foreground flex items-center gap-2">
+        <DialogContent showCloseButton={false} className="max-w-[92vw] sm:max-w-4xl w-full bg-[var(--surface)] border-border/40 p-0 overflow-hidden shadow-2xl rounded-2xl">
+          <DialogHeader className="p-4 pr-10 sm:pr-4 bg-[var(--surface-hover)] border-b border-[var(--border-subtle)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative">
+            <div className="flex-1 min-w-0 pr-2 sm:pr-0">
+              <DialogTitle className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
                 <span className="relative flex h-2 w-2 flex-shrink-0">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
@@ -300,7 +300,7 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
                 <span>{t('activeChannel')}</span>
-                <span className="text-primary font-semibold truncate max-w-[180px] sm:max-w-xs">{activeChannel.name || t('loading')}</span>
+                <span className="text-primary font-semibold truncate max-w-[150px] sm:max-w-xs">{activeChannel.name || t('loading')}</span>
               </DialogDescription>
             </div>
 
@@ -309,7 +309,7 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}
                   disabled={loadingSchedule}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--control-bg)] border border-[var(--border-subtle)] text-xs font-semibold text-foreground hover:bg-[var(--surface-hover)] transition-colors disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--control-bg)] border border-[var(--border-subtle)] text-xs font-semibold text-foreground hover:bg-[var(--surface-hover)] transition-colors disabled:opacity-50 cursor-pointer"
                 >
                   <span>{t('changeSignal')}</span>
                   <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
@@ -330,7 +330,7 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
                               setActiveChannel(ch);
                               setShowDropdown(false);
                             }}
-                            className={`w-full text-left px-3 py-2 text-xs transition-colors flex flex-col ${
+                            className={`w-full text-left px-3 py-2 text-xs transition-colors flex flex-col cursor-pointer ${
                               activeChannel.url === ch.url 
                                 ? 'bg-primary/15 text-primary font-bold' 
                                 : 'text-[var(--text)] hover:bg-[var(--surface-hover)]'
@@ -354,7 +354,7 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
                           setActiveChannel(ch);
                           setShowDropdown(false);
                         }}
-                        className={`w-full text-left px-3 py-2 text-xs transition-colors flex flex-col ${
+                        className={`w-full text-left px-3 py-2 text-xs transition-colors flex flex-col cursor-pointer ${
                           activeChannel.url === ch.url 
                             ? 'bg-primary/15 text-primary font-bold' 
                             : 'text-[var(--text)] hover:bg-[var(--surface-hover)]'
@@ -384,7 +384,7 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/10 rounded-full flex-shrink-0"
+              className="absolute top-3 right-3 h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/10 rounded-full flex-shrink-0 z-50 cursor-pointer"
               onClick={() => {
                 setIsOpen(false);
                 setShowDropdown(false);

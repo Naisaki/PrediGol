@@ -384,25 +384,25 @@ export function LandingClient() {
 
       {/* Navbar Header */}
       <header className="fixed top-0 left-0 right-0 z-30 flex justify-center w-full border-b border-[var(--border-subtle)] bg-[var(--background)]/85 backdrop-blur-md transition-colors duration-300">
-        <div className="w-full max-w-[1360px] px-6 lg:px-20 h-16 flex items-center justify-between">
+        <div className="w-full max-w-[1360px] px-3 sm:px-6 lg:px-20 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="h-9 w-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-lg shadow-primary/5">
               <Trophy className="h-5 w-5 text-primary" />
             </div>
-            <span className="font-bold tracking-tight text-[var(--text)] text-base select-none">
+            <span className="font-bold tracking-tight text-[var(--text)] text-sm sm:text-base select-none">
               {t('navTitle1')}<span className="text-primary font-black">{t('navTitle2')}</span>
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             {/* Language Selector */}
             <div className="relative" ref={langMenuRef}>
               <button
                 onClick={() => setShowLangMenu(!showLangMenu)}
-                className="flex items-center justify-between gap-1.5 h-10 px-4 bg-[var(--control-bg)] border border-[var(--border-subtle)] rounded-full hover:bg-[var(--surface-hover)] transition-all text-[var(--text)] text-xs font-semibold cursor-pointer select-none"
+                className="flex items-center justify-between gap-1 h-9 sm:h-10 px-2 sm:px-4 bg-[var(--control-bg)] border border-[var(--border-subtle)] rounded-full hover:bg-[var(--surface-hover)] transition-all text-[var(--text)] text-xs font-semibold cursor-pointer select-none"
               >
                 {renderFlag(currentLang)}
-                <span className="text-xs font-bold">{currentLang}</span>
+                <span className="text-xs font-bold hidden sm:inline">{currentLang}</span>
                 <ChevronDown className="h-3.5 w-3.5 text-[var(--text-muted)]" />
               </button>
 
@@ -430,17 +430,17 @@ export function LandingClient() {
             </div>
 
             {/* Theme Toggle Wrapper */}
-            <div className="inline-flex items-center justify-center border border-[var(--border-subtle)] bg-[var(--control-bg)] rounded-full hover:bg-[var(--surface-hover)] text-[var(--text)] h-10 w-10 transition-all cursor-pointer">
+            <div className="inline-flex items-center justify-center border border-[var(--border-subtle)] bg-[var(--control-bg)] rounded-full hover:bg-[var(--surface-hover)] text-[var(--text)] h-9 w-9 sm:h-10 sm:w-10 transition-all cursor-pointer">
               <ThemeToggle />
             </div>
 
-            <Link href="/login">
+            <Link href="/login" className="hidden sm:inline-block">
               <Button variant="ghost" className="text-[var(--text-muted)] hover:text-[var(--text)] transition-colors h-10 cursor-pointer">
                 {t('login')}
               </Button>
             </Link>
             <Link href="/register">
-              <Button className="bg-[var(--text)] text-[var(--background)] hover:opacity-90 transition-opacity font-semibold h-10 rounded-full px-5 cursor-pointer">
+              <Button className="bg-[var(--text)] text-[var(--background)] hover:opacity-90 transition-opacity font-semibold h-9 sm:h-10 rounded-full px-3 sm:px-5 text-xs sm:text-sm cursor-pointer">
                 {t('register')}
               </Button>
             </Link>
@@ -473,11 +473,9 @@ export function LandingClient() {
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto animate-scale-in">
               <Link href="/register" className="w-full sm:w-auto">
-                <button className="relative flex items-center justify-between sm:justify-center gap-3 overflow-hidden rounded-full border border-[var(--border-subtle)] bg-[var(--text)] hover:opacity-90 px-6 h-12 w-full transition-all duration-300 cursor-pointer">
+                <button className="relative flex items-center justify-center gap-2 overflow-hidden rounded-full border border-[var(--border-subtle)] bg-[var(--text)] hover:opacity-90 px-8 h-12 w-full transition-all duration-300 cursor-pointer">
                   <span className="font-bold text-[var(--background)] text-base whitespace-nowrap">{t('ctaPrimary')}</span>
-                  <div className="w-8 h-8 rounded-full bg-[var(--background)]/10 flex items-center justify-center">
-                    <ChevronRight className="h-5 w-5 text-[var(--background)]" />
-                  </div>
+                  <ChevronRight className="h-4 w-4 text-[var(--background)]" />
                 </button>
               </Link>
 
@@ -485,10 +483,10 @@ export function LandingClient() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-[var(--border-subtle)] hover:border-primary/50 bg-[var(--control-bg)] hover:bg-[var(--surface-hover)] text-[var(--text)] px-8 h-12 text-base font-semibold transition-all rounded-full w-full cursor-pointer"
+                  className="border-[var(--border-subtle)] hover:border-primary/50 bg-[var(--control-bg)] hover:bg-[var(--surface-hover)] text-[var(--text)] px-8 h-12 text-base font-semibold transition-all rounded-full w-full cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <Hash className="mr-2 h-4 w-4 text-primary" />
-                  {t('ctaSecondary')}
+                  <Hash className="h-4 w-4 text-primary" />
+                  <span>{t('ctaSecondary')}</span>
                 </Button>
               </Link>
             </div>

@@ -519,7 +519,7 @@ export default function StreamsPage() {
                 </div>
 
                 {/* Video Player */}
-                <div className="relative flex-1 bg-black min-h-0">
+                <div className="relative w-full bg-black aspect-video lg:flex-1 lg:aspect-auto lg:min-h-0">
                   <iframe
                     src={activeChannel.url}
                     className="absolute inset-0 w-full h-full border-none"

@@ -437,7 +437,7 @@ export function DashboardNavbar({
 
             {/* User Profile Direct Link */}
             <Link href="/profile">
-              <button className="flex items-center gap-2 h-8 px-2.5 bg-[var(--control-bg)] border border-[var(--border-subtle)] rounded-full hover:bg-[var(--surface-hover)] text-[var(--text)] text-xs cursor-pointer transition-all">
+              <button className="flex items-center justify-center sm:justify-start gap-2 h-8 w-8 sm:w-auto sm:px-2.5 bg-[var(--control-bg)] border border-[var(--border-subtle)] rounded-full hover:bg-[var(--surface-hover)] text-[var(--text)] text-xs cursor-pointer transition-all">
                 <Avatar className="h-5 w-5 border border-[var(--border-subtle)]">
                   <AvatarImage src={avatarUrl ?? ''} alt={username} />
                   <AvatarFallback className="bg-[var(--surface-hover)] text-[var(--text)] text-[9px] font-bold">
