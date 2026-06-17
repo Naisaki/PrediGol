@@ -9,6 +9,7 @@ import { LocalTime } from '@/components/common/local-time';
 import { StreamPlayerModal } from './stream-player-modal';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils/cn';
+import { translateTeamName } from '@/lib/utils/teams';
 
 interface Match {
   id: string;
@@ -387,12 +388,12 @@ export function LiveMatchesClient({ initialMatches, lastSyncTime, dbError }: Liv
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={match.home_team_crest}
-                          alt={match.home_team_name ?? ''}
+                          alt={translateTeamName(match.home_team_name, lang) || ''}
                           className="team-flag w-8 h-6"
                         />
                       )}
                       <span className={cn('font-semibold text-sm text-[var(--text)]', match.winner === 'home' && 'text-primary')}>
-                        {match.home_team_name ?? 'Por definir'}
+                        {translateTeamName(match.home_team_name, lang) || 'Por definir'}
                       </span>
                     </div>
 
@@ -421,12 +422,12 @@ export function LiveMatchesClient({ initialMatches, lastSyncTime, dbError }: Liv
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={match.away_team_crest}
-                          alt={match.away_team_name ?? ''}
+                          alt={translateTeamName(match.away_team_name, lang) || ''}
                           className="team-flag w-8 h-6"
                         />
                       )}
                       <span className={cn('font-semibold text-sm text-[var(--text)]', match.winner === 'away' && 'text-primary')}>
-                        {match.away_team_name ?? 'Por definir'}
+                        {translateTeamName(match.away_team_name, lang) || 'Por definir'}
                       </span>
                     </div>
                   </div>
