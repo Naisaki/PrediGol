@@ -7,6 +7,7 @@ import { Users, Calendar, Target, Trophy, ChevronRight, Plus } from 'lucide-reac
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { LocalTime } from '@/components/common/local-time';
+import { translateTeamName } from '@/lib/utils/teams';
 
 interface Match {
   id: string;
@@ -494,7 +495,7 @@ export function TodayMatchesSection({ groups, windowMatches }: TodayMatchesSecti
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={match.home_team_crest}
-                              alt={match.home_team_name ?? 'TBD'}
+                              alt={translateTeamName(match.home_team_name, lang) || 'TBD'}
                               className="w-4 h-4 object-contain"
                             />
                           ) : (
@@ -502,7 +503,7 @@ export function TodayMatchesSection({ groups, windowMatches }: TodayMatchesSecti
                               H
                             </div>
                           )}
-                          <span className="font-medium text-foreground">{match.home_team_name ?? 'TBD'}</span>
+                          <span className="font-medium text-foreground">{translateTeamName(match.home_team_name, lang) || 'TBD'}</span>
                         </div>
 
                         <span className="text-muted-foreground font-semibold text-xs">vs</span>
@@ -513,7 +514,7 @@ export function TodayMatchesSection({ groups, windowMatches }: TodayMatchesSecti
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={match.away_team_crest}
-                              alt={match.away_team_name ?? 'TBD'}
+                              alt={translateTeamName(match.away_team_name, lang) || 'TBD'}
                               className="w-4 h-4 object-contain"
                             />
                           ) : (
@@ -521,7 +522,7 @@ export function TodayMatchesSection({ groups, windowMatches }: TodayMatchesSecti
                               A
                             </div>
                           )}
-                          <span className="font-medium text-foreground">{match.away_team_name ?? 'TBD'}</span>
+                          <span className="font-medium text-foreground">{translateTeamName(match.away_team_name, lang) || 'TBD'}</span>
                         </div>
                       </div>
                       

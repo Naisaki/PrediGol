@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Calendar } from 'lucide-react';
 import { LocalTime } from '@/components/common/local-time';
 import { cn } from '@/lib/utils/cn';
+import { translateTeamName } from '@/lib/utils/teams';
 
 function getLocalDateString(date: Date): string {
   const year = date.getFullYear();
@@ -473,12 +474,12 @@ export function MatchesCalendar({ initialMatches, dbError }: MatchesCalendarProp
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={match.home_team_crest}
-                              alt={match.home_team_name ?? ''}
+                              alt={translateTeamName(match.home_team_name, lang) || ''}
                               className="team-flag w-6 h-4 sm:w-7 sm:h-5 flex-shrink-0"
                             />
                           )}
                           <span className={cn('font-semibold text-xs sm:text-sm truncate text-[var(--text)]', match.winner === 'home' && 'text-primary')}>
-                            {match.home_team_name ?? 'Por definir'}
+                            {translateTeamName(match.home_team_name, lang) || 'Por definir'}
                           </span>
                         </div>
 
@@ -504,13 +505,13 @@ export function MatchesCalendar({ initialMatches, dbError }: MatchesCalendarProp
                         {/* Away Team */}
                         <div className="flex-1 flex items-center justify-end gap-1.5 sm:gap-3 min-w-0 text-right">
                           <span className={cn('font-semibold text-xs sm:text-sm truncate text-[var(--text)]', match.winner === 'away' && 'text-primary')}>
-                            {match.away_team_name ?? 'Por definir'}
+                            {translateTeamName(match.away_team_name, lang) || 'Por definir'}
                           </span>
                           {match.away_team_crest && (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={match.away_team_crest}
-                              alt={match.away_team_name ?? ''}
+                              alt={translateTeamName(match.away_team_name, lang) || ''}
                               className="team-flag w-6 h-4 sm:w-7 sm:h-5 flex-shrink-0"
                             />
                           )}
