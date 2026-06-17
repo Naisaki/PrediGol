@@ -238,8 +238,8 @@ export default function StreamsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Lista de canales */}
-        <div className="lg:col-span-1 space-y-3 max-h-[600px] overflow-y-auto pr-1">
-          <div className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider px-1 mb-2">
+        <div className="lg:col-span-1 space-y-3 lg:max-h-[600px] lg:overflow-y-auto overflow-x-auto flex flex-row lg:flex-col gap-3 lg:gap-0 pb-3 lg:pb-0 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent overscroll-behavior-x-contain -webkit-overflow-scrolling-touch">
+          <div className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider px-1 mb-2 hidden lg:block">
             {t('availableSignals')}
           </div>
           {CHANNELS.map((ch, idx) => {
@@ -249,13 +249,13 @@ export default function StreamsPage() {
                 key={idx}
                 onClick={() => setActiveChannel(ch)}
                 className={cn(
-                  'cursor-pointer border transition-all hover:bg-[var(--surface-hover)]',
+                  'cursor-pointer border transition-all hover:bg-[var(--surface-hover)] flex-shrink-0 w-[260px] lg:w-full lg:mb-3',
                   isSelected 
                     ? 'bg-primary/5 border-primary/45 shadow-md shadow-primary/5' 
                     : 'glass-card border-border/40'
                 )}
               >
-                <CardContent className="p-4 flex items-center justify-between gap-4">
+                <CardContent className="p-4 flex items-center justify-between gap-4 h-full">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="relative flex h-2 w-2 flex-shrink-0">
