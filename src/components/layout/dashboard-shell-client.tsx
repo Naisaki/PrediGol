@@ -36,7 +36,7 @@ export function DashboardShellClient({
   };
 
   return (
-    <div className="flex flex-col gap-3 min-h-screen lg:h-dvh w-screen lg:overflow-hidden p-3 bg-[var(--background)]">
+    <div className="flex flex-col gap-3 min-h-screen lg:h-dvh w-full max-w-full overflow-x-hidden lg:overflow-hidden p-3 bg-[var(--background)]">
       {/* Top Navbar (Fijo arriba en el contenedor flex) */}
       <DashboardNavbar
         username={username}

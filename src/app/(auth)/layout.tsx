@@ -99,7 +99,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen w-screen flex flex-col bg-[var(--background)] relative overflow-x-hidden">
+    <div className="min-h-screen w-full max-w-full flex flex-col bg-[var(--background)] relative overflow-x-hidden">
       {/* Background Grid Pattern Overlay */}
       <div className="absolute inset-0 pointer-events-none auth-grid-overlay opacity-80" />
       

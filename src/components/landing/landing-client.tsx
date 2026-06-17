@@ -369,7 +369,7 @@ export function LandingClient() {
   const pointsResult = calculatePoints();
 
   return (
-    <div className="min-h-screen w-screen flex flex-col bg-[var(--background)] text-[var(--text)] font-sans relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen w-full max-w-full flex flex-col bg-[var(--background)] text-[var(--text)] font-sans relative overflow-x-hidden transition-colors duration-300">
       
       {/* Decorative vertical outer lines */}
       <div className="pointer-events-none absolute top-0 bottom-0 left-0 border-r border-[var(--border-subtle)] w-14 h-full z-10 hidden lg:block bg-[repeating-linear-gradient(315deg,rgba(0,0,0,0.02)_0,rgba(0,0,0,0.02)_1px,transparent_0,transparent_50%)] dark:bg-[repeating-linear-gradient(315deg,rgba(255,255,255,0.03)_0,rgba(255,255,255,0.03)_1px,transparent_0,transparent_50%)] bg-[size:10px_10px]" />
@@ -504,7 +504,7 @@ export function LandingClient() {
 
           {/* Right Column: Interactive Sandbox Game Simulation */}
           <div className="lg:col-span-5 w-full flex items-center justify-center animate-scale-in">
-            <div className="w-full max-w-[380px] bg-[var(--surface)] border border-[var(--border-subtle)] rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+            <div className="w-full max-w-[350px] xs:max-w-[380px] bg-[var(--surface)] border border-[var(--border-subtle)] rounded-3xl p-4 xs:p-6 shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-primary/45 to-transparent" />
               
               {/* Header of Sandbox */}
@@ -520,41 +520,51 @@ export function LandingClient() {
               </div>
 
               {/* Match Teams & Real Score Setter */}
-              <div className="flex items-center justify-between gap-4 py-4 bg-[var(--background)]/40 p-4 rounded-2xl border border-[var(--border-subtle)] mb-4">
-                <div className="flex flex-col items-center gap-1 flex-1">
-                  <div className="text-3xl">🇪🇸</div>
-                  <span className="text-xs font-bold">ESP</span>
+              <div className="flex items-center justify-between gap-1 sm:gap-2.5 py-3 px-1.5 sm:p-4 bg-[var(--background)]/40 rounded-2xl border border-[var(--border-subtle)] mb-4 min-w-0 w-full">
+                <div className="flex flex-col items-center gap-1.5 flex-1 min-w-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img 
+                    src="https://flagcdn.com/w80/es.png" 
+                    alt="España" 
+                    className="w-8 h-5.5 sm:w-9 sm:h-6 object-cover rounded-md shadow-sm border border-border/10 flex-shrink-0"
+                  />
+                  <span className="text-2xs sm:text-xs font-bold">ESP</span>
                 </div>
                 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 flex-shrink-0">
                   <button 
                     onClick={() => setHomeScore(Math.max(0, homeScore - 1))}
-                    className="w-6 h-6 rounded-full bg-[var(--control-bg)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] flex items-center justify-center font-bold text-xs select-none cursor-pointer"
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[var(--control-bg)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] flex items-center justify-center font-bold text-xs select-none cursor-pointer flex-shrink-0"
                   >-</button>
-                  <span className="text-3xl font-black min-w-[20px] text-center">{homeScore}</span>
+                  <span className="text-2xl sm:text-3xl font-black min-w-[16px] sm:min-w-[20px] text-center flex-shrink-0">{homeScore}</span>
                   <button 
                     onClick={() => setHomeScore(homeScore + 1)}
-                    className="w-6 h-6 rounded-full bg-[var(--control-bg)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] flex items-center justify-center font-bold text-xs select-none cursor-pointer"
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[var(--control-bg)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] flex items-center justify-center font-bold text-xs select-none cursor-pointer flex-shrink-0"
                   >+</button>
                 </div>
                 
-                <span className="text-neutral-400 font-bold text-sm">:</span>
+                <span className="text-neutral-400 font-bold text-sm flex-shrink-0">:</span>
                 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 flex-shrink-0">
                   <button 
                     onClick={() => setAwayScore(Math.max(0, awayScore - 1))}
-                    className="w-6 h-6 rounded-full bg-[var(--control-bg)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] flex items-center justify-center font-bold text-xs select-none cursor-pointer"
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[var(--control-bg)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] flex items-center justify-center font-bold text-xs select-none cursor-pointer flex-shrink-0"
                   >-</button>
-                  <span className="text-3xl font-black min-w-[20px] text-center">{awayScore}</span>
+                  <span className="text-2xl sm:text-3xl font-black min-w-[16px] sm:min-w-[20px] text-center flex-shrink-0">{awayScore}</span>
                   <button 
                     onClick={() => setAwayScore(awayScore + 1)}
-                    className="w-6 h-6 rounded-full bg-[var(--control-bg)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] flex items-center justify-center font-bold text-xs select-none cursor-pointer"
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[var(--control-bg)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] flex items-center justify-center font-bold text-xs select-none cursor-pointer flex-shrink-0"
                   >+</button>
                 </div>
 
-                <div className="flex flex-col items-center gap-1 flex-1">
-                  <div className="text-3xl">🇫🇷</div>
-                  <span className="text-xs font-bold">FRA</span>
+                <div className="flex flex-col items-center gap-1.5 flex-1 min-w-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img 
+                    src="https://flagcdn.com/w80/fr.png" 
+                    alt="Francia" 
+                    className="w-8 h-5.5 sm:w-9 sm:h-6 object-cover rounded-md shadow-sm border border-border/10 flex-shrink-0"
+                  />
+                  <span className="text-2xs sm:text-xs font-bold">FRA</span>
                 </div>
               </div>
 
