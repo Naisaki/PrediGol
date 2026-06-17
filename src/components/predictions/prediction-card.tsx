@@ -173,7 +173,7 @@ export function PredictionCard({
           <div className="flex flex-col items-center gap-3 mx-2">
             {/* Resultado real (si finalizado) */}
             {hasResult && (
-              <div className="flex items-center gap-2 text-lg font-black">
+              <div className="flex items-center gap-2 text-2xl font-black">
                 <span
                   className={cn(
                     match.winner === 'home' ? 'text-primary' : 'text-foreground',
@@ -220,17 +220,17 @@ export function PredictionCard({
                 />
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 text-sm">
+              <div className="flex items-center gap-2 text-xl font-bold bg-[var(--control-bg)] px-3 py-1 rounded-lg border border-[var(--border-subtle)]">
                 {prediction ? (
                   <>
-                    <span className="font-bold">{prediction.predicted_home_score}</span>
-                    <span className="text-muted-foreground">:</span>
-                    <span className="font-bold">{prediction.predicted_away_score}</span>
-                    <Lock className="h-3 w-3 text-muted-foreground ml-1" />
+                    <span className="font-extrabold text-primary">{prediction.predicted_home_score}</span>
+                    <span className="text-muted-foreground font-light">:</span>
+                    <span className="font-extrabold text-primary">{prediction.predicted_away_score}</span>
+                    <Lock className="h-3.5 w-3.5 text-muted-foreground ml-1" />
                   </>
                 ) : (
                   <span className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Lock className="h-3 w-3" /> Sin pronóstico
+                    <Lock className="h-3.5 w-3.5" /> Sin pronóstico
                   </span>
                 )}
               </div>

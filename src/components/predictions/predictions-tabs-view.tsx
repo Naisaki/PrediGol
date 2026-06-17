@@ -134,7 +134,7 @@ export function PredictionsTabsView({
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'flex items-center justify-between p-3.5 rounded-xl border transition-all text-left duration-200 outline-none',
+                'flex items-center justify-between p-3.5 rounded-xl border transition-all text-left duration-200 outline-none cursor-pointer',
                 isActive
                   ? tab.activeClass + ' shadow-md shadow-black/10 scale-[1.01]'
                   : 'glass-card border-border/40 hover:border-border/80 hover:bg-muted/10 text-muted-foreground'
