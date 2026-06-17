@@ -97,7 +97,7 @@ export function InteractiveBracketWrapper({
   };
 
   return (
-    <div className="relative w-full border border-border/30 rounded-2xl bg-slate-950/20 overflow-hidden min-h-[620px] select-none">
+    <div className="relative w-full border border-border/30 rounded-2xl bg-[var(--surface)]/20 overflow-hidden min-h-[620px] select-none">
       {/* Panel de Controles Flotante */}
       <div className="absolute right-4 top-4 z-10 flex items-center gap-1 bg-background/80 backdrop-blur border border-border/40 p-1.5 rounded-lg shadow-lg">
         <Button

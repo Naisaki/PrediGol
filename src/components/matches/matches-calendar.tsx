@@ -466,26 +466,26 @@ export function MatchesCalendar({ initialMatches, dbError }: MatchesCalendarProp
                       </div>
 
                       {/* Teams & Score */}
-                      <div className="flex items-center justify-between gap-4 py-2">
+                      <div className="flex items-center justify-between gap-2 py-2">
                         {/* Home Team */}
-                        <div className="flex-1 flex items-center gap-3 min-w-0">
+                        <div className="flex-1 flex items-center gap-1.5 sm:gap-3 min-w-0">
                           {match.home_team_crest && (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={match.home_team_crest}
                               alt={match.home_team_name ?? ''}
-                              className="team-flag w-7 h-5 flex-shrink-0"
+                              className="team-flag w-6 h-4 sm:w-7 sm:h-5 flex-shrink-0"
                             />
                           )}
-                          <span className={cn('font-semibold text-sm truncate text-[var(--text)]', match.winner === 'home' && 'text-primary')}>
+                          <span className={cn('font-semibold text-xs sm:text-sm truncate text-[var(--text)]', match.winner === 'home' && 'text-primary')}>
                             {match.home_team_name ?? 'Por definir'}
                           </span>
                         </div>
 
                         {/* Score or time */}
-                        <div className="flex items-center justify-center min-w-[70px] bg-muted/20 px-2 py-1.5 rounded-lg border border-border/20">
+                        <div className="flex items-center justify-center min-w-[55px] sm:min-w-[70px] bg-muted/20 px-1.5 sm:px-2 py-1 rounded-lg border border-border/20">
                           {hasScore ? (
-                            <div className="flex items-center gap-1.5 text-base font-black text-[var(--text)]">
+                            <div className="flex items-center gap-1 text-sm sm:text-base font-black text-[var(--text)]">
                               <span className={match.winner === 'home' ? 'text-primary' : ''}>
                                 {match.home_score}
                               </span>
@@ -495,15 +495,15 @@ export function MatchesCalendar({ initialMatches, dbError }: MatchesCalendarProp
                               </span>
                             </div>
                           ) : (
-                            <div className="text-xs font-bold text-muted-foreground">
+                            <div className="text-[10px] sm:text-xs font-bold text-muted-foreground">
                               <LocalTime utcDate={match.kickoff_time} />
                             </div>
                           )}
                         </div>
 
                         {/* Away Team */}
-                        <div className="flex-1 flex items-center justify-end gap-3 min-w-0 text-right">
-                          <span className={cn('font-semibold text-sm truncate text-[var(--text)]', match.winner === 'away' && 'text-primary')}>
+                        <div className="flex-1 flex items-center justify-end gap-1.5 sm:gap-3 min-w-0 text-right">
+                          <span className={cn('font-semibold text-xs sm:text-sm truncate text-[var(--text)]', match.winner === 'away' && 'text-primary')}>
                             {match.away_team_name ?? 'Por definir'}
                           </span>
                           {match.away_team_crest && (
@@ -511,7 +511,7 @@ export function MatchesCalendar({ initialMatches, dbError }: MatchesCalendarProp
                             <img
                               src={match.away_team_crest}
                               alt={match.away_team_name ?? ''}
-                              className="team-flag w-7 h-5 flex-shrink-0"
+                              className="team-flag w-6 h-4 sm:w-7 sm:h-5 flex-shrink-0"
                             />
                           )}
                         </div>

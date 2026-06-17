@@ -226,8 +226,9 @@ export function GroupsClient({ initialStandings }: GroupsClientProps) {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <Table>
-                    <TableHeader className="bg-muted/5">
+                  <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent -webkit-overflow-scrolling-touch">
+                    <Table className="min-w-[500px] sm:min-w-0">
+                      <TableHeader className="bg-muted/5">
                       <TableRow className="border-border/30 hover:bg-transparent">
                         <TableHead className="w-12 text-center text-xs font-semibold text-[var(--text-muted)]">{t('pos')}</TableHead>
                         <TableHead className="text-xs font-semibold text-[var(--text-muted)]">{t('team')}</TableHead>
@@ -300,7 +301,8 @@ export function GroupsClient({ initialStandings }: GroupsClientProps) {
                         </TableRow>
                       ))}
                     </TableBody>
-                  </Table>
+                    </Table>
+                  </div>
                 </CardContent>
               </Card>
             );
