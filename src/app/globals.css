@@ -429,3 +429,18 @@ body {
 .dark .dots-pattern {
   background-image: radial-gradient(circle, var(--dark-dot-color) var(--dot-size), transparent var(--dot-size));
 }
+
+/* ============================================================
+   Auth Pages Grid & Accent Patterns
+   ============================================================ */
+.auth-grid-overlay {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: center;
+}
+
+.dark .auth-grid-overlay {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+}
