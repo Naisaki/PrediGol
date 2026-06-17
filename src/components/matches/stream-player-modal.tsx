@@ -204,12 +204,26 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
         if (res.ok) {
           const agenda = await res.json();
           
-          const homeClean = cleanTeamName(homeTeam);
-          const awayClean = cleanTeamName(awayTeam);
+          // Obtener todas las traducciones posibles de los equipos para buscar coincidencia sin importar el idioma de la agenda
+          const homeTranslations = new Set<string>();
+          homeTranslations.add(cleanTeamName(homeTeam));
+          ['ES', 'EN', 'FR', 'IT', 'JA', 'KO'].forEach(l => {
+            const trans = translateTeamName(homeTeam, l);
+            if (trans) homeTranslations.add(cleanTeamName(trans));
+          });
+
+          const awayTranslations = new Set<string>();
+          awayTranslations.add(cleanTeamName(awayTeam));
+          ['ES', 'EN', 'FR', 'IT', 'JA', 'KO'].forEach(l => {
+            const trans = translateTeamName(awayTeam, l);
+            if (trans) awayTranslations.add(cleanTeamName(trans));
+          });
 
           const matchedEvents = agenda.filter((event: any) => {
             const titleClean = cleanTeamName(event.title || '');
-            return titleClean.includes(homeClean) || titleClean.includes(awayClean);
+            const matchesHome = Array.from(homeTranslations).some(name => titleClean.includes(name));
+            const matchesAway = Array.from(awayTranslations).some(name => titleClean.includes(name));
+            return matchesHome || matchesAway;
           });
 
           if (matchedEvents.length > 0) {
