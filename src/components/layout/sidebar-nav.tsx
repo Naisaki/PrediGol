@@ -244,7 +244,7 @@ export function SidebarNav({ username, avatarUrl, collapsed }: SidebarNavProps) 
         </nav>
 
         {/* Footer Area */}
-        <div className="pt-2 border-t border-[var(--border)] px-2 shrink-0">
+        <div className="pt-2 border-t border-[hsl(var(--border))] px-2 shrink-0">
           <form action={logoutAction}>
             <button
               type="submit"
