@@ -10,8 +10,8 @@
 
 :root {
   /* -- Colores base (Modo Claro) -- */
-  --background: 200 10% 97%; /* #f5f7f8 equivalent */
-  --foreground: 220 15% 10%; /* #111827 equivalent */
+  --background: hsl(200 10% 97%); /* #f5f7f8 equivalent */
+  --foreground: hsl(220 15% 10%); /* #111827 equivalent */
 
   /* -- Variables personalizadas del sidebar / diseño (Modo Claro) -- */
   --surface: #fff;
