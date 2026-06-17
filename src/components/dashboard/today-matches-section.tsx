@@ -486,47 +486,51 @@ export function TodayMatchesSection({ groups, windowMatches }: TodayMatchesSecti
                   return (
                     <div
                       key={match.id}
-                      className="flex items-center justify-between p-3.5 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors border border-border/10"
+                      className="flex items-center justify-between p-3 sm:p-3.5 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors border border-border/10 gap-2"
                     >
-                      <div className="flex items-center gap-3 text-sm">
+                      <div className="flex-1 min-w-0 flex items-center gap-2 text-xs sm:text-sm">
                         {/* Home Team Flag */}
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 min-w-0 flex-shrink-0 sm:flex-shrink">
                           {match.home_team_crest ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={match.home_team_crest}
                               alt={translateTeamName(match.home_team_name, lang) || 'TBD'}
-                              className="w-4 h-4 object-contain"
+                              className="w-4 h-4 object-contain flex-shrink-0"
                             />
                           ) : (
-                            <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center text-[7px] font-bold">
+                            <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center text-[7px] font-bold flex-shrink-0">
                               H
                             </div>
                           )}
-                          <span className="font-medium text-foreground">{translateTeamName(match.home_team_name, lang) || 'TBD'}</span>
+                          <span className="font-medium text-foreground truncate max-w-[65px] xs:max-w-[95px] sm:max-w-none block">
+                            {translateTeamName(match.home_team_name, lang) || 'TBD'}
+                          </span>
                         </div>
 
-                        <span className="text-muted-foreground font-semibold text-xs">vs</span>
+                        <span className="text-muted-foreground font-semibold text-[10px] sm:text-xs flex-shrink-0">vs</span>
 
                         {/* Away Team Flag */}
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 min-w-0 flex-shrink-0 sm:flex-shrink">
                           {match.away_team_crest ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={match.away_team_crest}
                               alt={translateTeamName(match.away_team_name, lang) || 'TBD'}
-                              className="w-4 h-4 object-contain"
+                              className="w-4 h-4 object-contain flex-shrink-0"
                             />
                           ) : (
-                            <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center text-[7px] font-bold">
+                            <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center text-[7px] font-bold flex-shrink-0">
                               A
                             </div>
                           )}
-                          <span className="font-medium text-foreground">{translateTeamName(match.away_team_name, lang) || 'TBD'}</span>
+                          <span className="font-medium text-foreground truncate max-w-[65px] xs:max-w-[95px] sm:max-w-none block">
+                            {translateTeamName(match.away_team_name, lang) || 'TBD'}
+                          </span>
                         </div>
                       </div>
                       
-                      <div className="text-xs font-semibold text-primary">
+                      <div className="text-xs font-semibold text-primary whitespace-nowrap flex-shrink-0 text-right min-w-[70px] sm:min-w-[80px]">
                         {match.status === 'in_play' || match.status === 'paused' ? (
                           <span className="text-red-500 animate-pulse font-bold">{t('live')}</span>
                         ) : hasScore ? (
