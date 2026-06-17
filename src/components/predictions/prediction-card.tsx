@@ -106,12 +106,34 @@ export function PredictionCard({
   return (
     <Card
       className={cn(
-        'glass-card border-border/40 transition-all',
+        'glass-card border-transparent dark:border-[var(--border-subtle)] relative overflow-hidden transition-all duration-300',
         isLocked && 'opacity-90',
-        prediction && !isLocked && 'border-primary/20',
+        prediction && !isLocked && 'border-primary/25',
       )}
     >
-      <CardContent className="p-4">
+      {/* Dots background pattern */}
+      <div 
+        className="absolute -inset-[400px] pointer-events-none dots-pattern" 
+        style={{
+          opacity: 0.8,
+          transform: 'rotate(40deg)',
+          backgroundSize: '5px 5px',
+          '--dot-size': '3px',
+          '--light-dot-color': 'rgba(255, 255, 255, 0.25)',
+          '--dark-dot-color': 'rgba(0, 0, 0, 0.4)'
+        } as React.CSSProperties}
+      />
+      
+      {/* Glow effect */}
+      <div 
+        className="absolute inset-0 pointer-events-none" 
+        style={{ 
+          zIndex: 20, 
+          background: 'radial-gradient(1200px 600px at 0% 0%, rgba(205, 205, 205, 0.09) 0%, rgba(205, 205, 205, 0) 30%, transparent 70%)' 
+        }} 
+      />
+
+      <CardContent className="p-4 relative z-10">
         {/* Header: fecha, estado, etapa */}
         <div className="flex items-center justify-between mb-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-1.5">

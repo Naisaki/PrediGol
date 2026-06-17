@@ -427,12 +427,34 @@ export function MatchesCalendar({ initialMatches, dbError }: MatchesCalendarProp
                   <Card
                     key={match.id}
                     className={cn(
-                      'glass-card border-border/40 hover:border-primary/20 transition-all shadow-sm',
+                      'glass-card border-transparent dark:border-[var(--border-subtle)] hover:border-primary/20 transition-all duration-300 relative overflow-hidden shadow-sm',
                       (match.status === 'in_play' || match.status === 'paused') &&
                         'border-primary/30 shadow-lg shadow-primary/5',
                     )}
                   >
-                    <CardContent className="p-4">
+                    {/* Dots background pattern */}
+                    <div 
+                      className="absolute -inset-[400px] pointer-events-none dots-pattern" 
+                      style={{
+                        opacity: 0.8,
+                        transform: 'rotate(40deg)',
+                        backgroundSize: '5px 5px',
+                        '--dot-size': '3px',
+                        '--light-dot-color': 'rgba(255, 255, 255, 0.25)',
+                        '--dark-dot-color': 'rgba(0, 0, 0, 0.4)'
+                      } as React.CSSProperties}
+                    />
+                    
+                    {/* Glow effect */}
+                    <div 
+                      className="absolute inset-0 pointer-events-none" 
+                      style={{ 
+                        zIndex: 20, 
+                        background: 'radial-gradient(1200px 600px at 0% 0%, rgba(205, 205, 205, 0.09) 0%, rgba(205, 205, 205, 0) 30%, transparent 70%)' 
+                      }} 
+                    />
+
+                    <CardContent className="p-4 relative z-10">
                       {/* Top row */}
                       <div className="flex items-center justify-between mb-3 text-xs text-muted-foreground">
                         <span className="capitalize text-[var(--text-muted)]">

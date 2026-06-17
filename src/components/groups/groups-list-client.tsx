@@ -196,8 +196,30 @@ export function GroupsListClient({ initialGroups }: GroupsListClientProps) {
 
             return (
               <Link key={g.id} href={`/groups/${g.id}`}>
-                <Card className="glass-card border-border/40 hover:border-primary/30 hover:-translate-y-1 transition-all hover:shadow-lg hover:shadow-primary/5 cursor-pointer h-full group flex flex-col justify-between">
-                  <CardContent className="p-5 flex flex-col h-full">
+                <Card className="glass-card border-transparent dark:border-[var(--border-subtle)] hover:border-primary/30 hover:-translate-y-1 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-pointer h-full group flex flex-col justify-between relative overflow-hidden">
+                  {/* Dots background pattern */}
+                  <div 
+                    className="absolute -inset-[400px] pointer-events-none dots-pattern" 
+                    style={{
+                      opacity: 0.8,
+                      transform: 'rotate(40deg)',
+                      backgroundSize: '5px 5px',
+                      '--dot-size': '3px',
+                      '--light-dot-color': 'rgba(255, 255, 255, 0.25)',
+                      '--dark-dot-color': 'rgba(0, 0, 0, 0.4)'
+                    } as React.CSSProperties}
+                  />
+                  
+                  {/* Glow effect */}
+                  <div 
+                    className="absolute inset-0 pointer-events-none" 
+                    style={{ 
+                      zIndex: 20, 
+                      background: 'radial-gradient(1200px 600px at 0% 0%, rgba(205, 205, 205, 0.09) 0%, rgba(205, 205, 205, 0) 30%, transparent 70%)' 
+                    }} 
+                  />
+
+                  <CardContent className="p-5 flex flex-col h-full relative z-10">
                     {/* Header: Avatar / Image & Role */}
                     <div className="flex items-start justify-between mb-4">
                       {g.imageUrl ? (
