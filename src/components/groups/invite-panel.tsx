@@ -126,9 +126,8 @@ export function InvitePanel({
         <div className="flex flex-col sm:flex-row gap-2">
           <Button
             variant="outline"
-            size="sm"
             onClick={handleCopyLink}
-            className="flex-1 border-border/60 hover:bg-muted/40 text-xs"
+            className="flex-1 h-10 rounded-xl bg-[var(--control-bg)] hover:bg-[var(--surface-hover)] border border-border/30 text-xs font-semibold shadow-sm hover:scale-[1.01] transition-all"
           >
             {copiedLink ? (
               <Check className="h-3.5 w-3.5 mr-1.5 text-primary" />
@@ -141,9 +140,8 @@ export function InvitePanel({
           {qrCodeUrl && (
             <Button
               variant="outline"
-              size="sm"
               onClick={handleDownloadQR}
-              className="flex-1 border-border/60 hover:bg-muted/40 text-xs"
+              className="flex-1 h-10 rounded-xl bg-[var(--control-bg)] hover:bg-[var(--surface-hover)] border border-border/30 text-xs font-semibold shadow-sm hover:scale-[1.01] transition-all"
             >
               <Download className="h-3.5 w-3.5 mr-1.5" />
               Descargar QR

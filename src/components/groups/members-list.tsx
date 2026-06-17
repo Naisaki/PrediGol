@@ -76,14 +76,14 @@ export function MembersList({
 
   return (
     <Card className="glass-card border-border/40">
-      <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
-        <div>
-          <CardTitle className="text-base font-semibold">Miembros del Grupo</CardTitle>
-          <CardDescription className="text-xs">
+      <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0 gap-2">
+        <div className="flex-1 min-w-0 pr-2">
+          <CardTitle className="text-base font-semibold truncate">Miembros del Grupo</CardTitle>
+          <CardDescription className="text-xs truncate">
             Lista de participantes que compiten en este grupo.
           </CardDescription>
         </div>
-        <span className="text-xs font-semibold bg-primary/10 text-primary px-2 py-1 rounded-full">
+        <span className="text-xs font-semibold bg-primary/10 text-primary px-2.5 py-1 rounded-full whitespace-nowrap flex-shrink-0">
           {members.length} {members.length === 1 ? 'miembro' : 'miembros'}
         </span>
       </CardHeader>
