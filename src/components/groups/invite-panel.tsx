@@ -123,16 +123,16 @@ export function InvitePanel({
         </div>
 
         {/* Action buttons */}
-        <div className="flex flex-col sm:flex-row gap-2">
+        <div className="flex flex-col sm:flex-row gap-3">
           <Button
             variant="outline"
             onClick={handleCopyLink}
-            className="flex-1 h-10 rounded-xl bg-[var(--control-bg)] hover:bg-[var(--surface-hover)] border border-border/30 text-xs font-semibold shadow-sm hover:scale-[1.01] transition-all"
+            className="flex-1 h-12 py-3 px-4 rounded-xl bg-[var(--control-bg)] hover:bg-[var(--surface-hover)] border border-border/30 text-xs sm:text-sm font-semibold shadow-md shadow-black/5 hover:scale-[1.01] transition-all"
           >
             {copiedLink ? (
-              <Check className="h-3.5 w-3.5 mr-1.5 text-primary" />
+              <Check className="h-4 w-4 mr-2 text-primary" />
             ) : (
-              <Copy className="h-3.5 w-3.5 mr-1.5" />
+              <Copy className="h-4 w-4 mr-2" />
             )}
             Copiar enlace
           </Button>
@@ -141,9 +141,9 @@ export function InvitePanel({
             <Button
               variant="outline"
               onClick={handleDownloadQR}
-              className="flex-1 h-10 rounded-xl bg-[var(--control-bg)] hover:bg-[var(--surface-hover)] border border-border/30 text-xs font-semibold shadow-sm hover:scale-[1.01] transition-all"
+              className="flex-1 h-12 py-3 px-4 rounded-xl bg-[var(--control-bg)] hover:bg-[var(--surface-hover)] border border-border/30 text-xs sm:text-sm font-semibold shadow-md shadow-black/5 hover:scale-[1.01] transition-all"
             >
-              <Download className="h-3.5 w-3.5 mr-1.5" />
+              <Download className="h-4 w-4 mr-2" />
               Descargar QR
             </Button>
           )}
