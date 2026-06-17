@@ -32,6 +32,7 @@ const breadcrumbTranslations: Record<string, Record<string, string>> = {
     'Zona de peligro': 'Zona de peligro',
     'Nuevo grupo': 'Nuevo grupo',
     'Detalle del grupo': 'Detalle del grupo',
+    'Canales TV': 'Canales TV',
   },
   EN: {
     Dashboard: 'Dashboard',
@@ -52,6 +53,7 @@ const breadcrumbTranslations: Record<string, Record<string, string>> = {
     'Zona de peligro': 'Danger Zone',
     'Nuevo grupo': 'New Group',
     'Detalle del grupo': 'Group Details',
+    'Canales TV': 'TV Channels',
   },
   FR: {
     Dashboard: 'Tableau de bord',
@@ -72,6 +74,7 @@ const breadcrumbTranslations: Record<string, Record<string, string>> = {
     'Zona de peligro': 'Zone de danger',
     'Nuevo grupo': 'Nouveau groupe',
     'Detalle del grupo': 'Détails du groupe',
+    'Canales TV': 'Chaînes TV',
   },
   IT: {
     Dashboard: 'Dashboard',
@@ -92,6 +95,7 @@ const breadcrumbTranslations: Record<string, Record<string, string>> = {
     'Zona di pericolo': 'Zona di pericolo',
     'Nuevo grupo': 'Nuovo gruppo',
     'Detalle del grupo': 'Dettagli del gruppo',
+    'Canales TV': 'Canali TV',
   },
   JA: {
     Dashboard: 'ダッシュボード',
@@ -112,6 +116,7 @@ const breadcrumbTranslations: Record<string, Record<string, string>> = {
     'Zona de peligro': '危険エリア',
     'Nuevo grupo': '新規グループ',
     'Detalle del grupo': 'グループ詳細',
+    'Canales TV': 'TVチャンネル',
   },
   KO: {
     Dashboard: '대시보드',
@@ -132,6 +137,7 @@ const breadcrumbTranslations: Record<string, Record<string, string>> = {
     'Zona de peligro': '위험 구역',
     'Nuevo grupo': '새 그룹',
     'Detalle del grupo': '그룹 상세 정보',
+    'Canales TV': 'TV 채널',
   },
 };
 
@@ -179,6 +185,8 @@ export function BreadcrumbNav() {
       items.push({ labelKey: 'Partidos', href: '/matches' });
     } else if (segment === 'live') {
       items.push({ labelKey: 'En Vivo', href: '/matches/live' });
+    } else if (segment === 'streams') {
+      items.push({ labelKey: 'Canales TV', href: '/matches/streams' });
     } else if (segment === 'world-cup') {
       // Ignorar el segmento intermedio 'world-cup' para no duplicar niveles
       continue;

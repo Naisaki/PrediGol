@@ -177,8 +177,11 @@ const streamsTranslations: Record<string, Record<string, string>> = {
     descTycSports: 'Fútbol argentino, copa nacional y deportes nacionales.',
     descLiga1Max: 'Partidos en vivo del fútbol profesional peruano.',
     descCaracol: 'Fútbol y deportes colombianos en vivo.',
-    descVtvPlus: 'Fútbol y deportes uruguayos en vivo.',
     descWinSports: 'Fútbol y deportes colombianos en vivo.',
+    loadingChannels: 'Actualizando estado de los canales en vivo...',
+    noActiveChannels: 'No hay canales de transmisión activos',
+    checkBackLater: 'Vuelve a consultar más tarde cuando haya partidos de fútbol en juego.',
+    selectChannel: 'Selecciona un canal para comenzar',
   },
   EN: {
     title: 'Streaming Channels',
@@ -205,8 +208,136 @@ const streamsTranslations: Record<string, Record<string, string>> = {
     descTycSports: 'Argentine football, national cup, and national sports.',
     descLiga1Max: 'Live matches of Peruvian professional football.',
     descCaracol: 'Live Colombian football and sports.',
-    descVtvPlus: 'Live Uruguayan football and sports.',
     descWinSports: 'Live Colombian football and sports.',
+    loadingChannels: 'Updating status of live channels...',
+    noActiveChannels: 'No active streaming channels',
+    checkBackLater: 'Check back later when football matches are in progress.',
+    selectChannel: 'Select a channel to start',
+  },
+  FR: {
+    title: 'Chaînes de Diffusion',
+    subtitle: 'Choisissez un signal sportif à regarder en direct à tout moment, même si aucun match n’est programmé.',
+    availableSignals: 'Signaux Disponibles',
+    playingNow: 'En cours de diffusion',
+    openExternal: 'Ouvrir le flux externe',
+    streamNoticeTitle: 'Avis de diffusion',
+    streamNoticeDesc: 'Ce signal est fourni en externe par {provider}. Nous vous recommandons vivement d’utiliser un bloqueur de publicité (AdBlocker) dans votre navigateur pour éviter les publicités pop-up du lecteur d’origine.',
+    descESPN: 'Football international, Champions League, ligues européennes.',
+    descESPN2: 'Tennis, ligues américaines et diffusions secondaires.',
+    descESPN3: 'Événements spéciaux, cyclisme, sports mécaniques.',
+    descESPN4: 'Diffusion en direct d’événements sportifs internationaux.',
+    descESPN5: 'Diffusion en direct d’événements sportifs internationaux.',
+    descESPN6: 'Diffusion en direct d’événements sportifs internationaux.',
+    descESPN7: 'Diffusion en direct d’événements sportifs internationaux.',
+    descESPNPremium: 'Matchs de football argentin en direct.',
+    descDsports: 'Exclusivités LaLiga, Copa del Rey et événements FIFA.',
+    descDsports2: 'Couverture secondaire des tournois continentaux et événements FIFA.',
+    descDsportsPlus: 'Couverture spéciale des tournois continentaux et événements FIFA.',
+    descFoxSports: 'Copa Libertadores, Champions League et sports mécaniques.',
+    descFoxSports2: 'Ligues continentales, NFL et sports extrêmes.',
+    descFoxSports3: 'Formule 1 et émissions spéciales de sports mécaniques.',
+    descTycSports: 'Football argentin, coupe nationale et sports nationaux.',
+    descLiga1Max: 'Matchs en direct du football professionnel péruvien.',
+    descCaracol: 'Football et sports colombiens en direct.',
+    descWinSports: 'Football et sports colombiens en direct.',
+    loadingChannels: 'Mise à jour du statut des chaînes en direct...',
+    noActiveChannels: 'Aucune chaîne de diffusion active',
+    checkBackLater: 'Revenez plus tard lorsque des matchs de football seront en cours.',
+    selectChannel: 'Sélectionnez une chaîne pour commencer',
+  },
+  IT: {
+    title: 'Canali di Trasmissione',
+    subtitle: 'Scegli un canale sportivo da guardare in diretta in qualsiasi momento, anche se non sono in programma partite.',
+    availableSignals: 'Canali Disponibili',
+    playingNow: 'In riproduzione ora',
+    openExternal: 'Apri sorgente esterna',
+    streamNoticeTitle: 'Avviso sulla trasmissione',
+    streamNoticeDesc: 'Questo segnale è fornito esternamente da {provider}. Ti consigliamo vivamente di utilizzare un blocco annunci (AdBlocker) nel tuo browser per evitare annunci pubblicitari pop-up dal player di origine.',
+    descESPN: 'Calcio internazionale, Champions League, campionati europei.',
+    descESPN2: 'Tennis, leghe americane e trasmissioni secondarie.',
+    descESPN3: 'Eventi speciali, ciclismo, sport motoristici.',
+    descESPN4: 'Trasmissione in diretta di eventi sportivi internazionali.',
+    descESPN5: 'Trasmissione in diretta di eventi sportivi internacionales.',
+    descESPN6: 'Trasmissione in diretta di eventi sportivi internazionali.',
+    descESPN7: 'Trasmissione in diretta di eventi sportivi internazionali.',
+    descESPNPremium: 'Partite di calcio argentino in diretta.',
+    descDsports: 'Esclusive LaLiga, Copa del Rey ed eventi FIFA.',
+    descDsports2: 'Copertura secondaria di tornei continentali ed eventi FIFA.',
+    descDsportsPlus: 'Copertura speciale di tornei continentali ed eventi FIFA.',
+    descFoxSports: 'Copa Libertadores, Champions League e sport motoristici.',
+    descFoxSports2: 'Campionati continentali, NFL e sport estremi.',
+    descFoxSports3: 'Formula 1 e trasmissioni motoristiche speciali.',
+    descTycSports: 'Calcio argentino, coppa nazionale e sport nazionali.',
+    descLiga1Max: 'Partite in diretta del calcio professionistico peruviano.',
+    descCaracol: 'Calcio e sport colombiani in diretta.',
+    descVtvPlus: 'Calcio e sport uruguaiani in diretta.',
+    descWinSports: 'Calcio e sport colombiani in diretta.',
+    loadingChannels: 'Aggiornamento dello stato dei canali in diretta...',
+    noActiveChannels: 'Nessun canale di trasmissione attivo',
+    checkBackLater: 'Torna a controllare più tardi quando ci saranno partite di calcio in corso.',
+    selectChannel: 'Seleziona un canale per iniziare',
+  },
+  JA: {
+    title: '配信チャンネル一覧',
+    subtitle: '予定されている試合がない場合でも、いつでもスポーツ中継をリアルタイムでご視聴いただけます。',
+    availableSignals: '利用可能なチャンネル',
+    playingNow: '現在再生中',
+    openExternal: '外部で開く',
+    streamNoticeTitle: '配信に関するお知らせ',
+    streamNoticeDesc: 'この信号は{provider}によって外部から提供されています。ソースプレーヤーのポップアップ広告を避けるために、ブラウザで広告ブロッカー（AdBlocker）を使用することを強くお勧めします。',
+    descESPN: '国際サッカー、チャンピオンズリーグ、欧州リーグ。',
+    descESPN2: 'テニス、アメリカンリーグ、およびサブ配信。',
+    descESPN3: 'スペシャルイベント、自転車、モータースポーツ。',
+    descESPN4: '国際スポーツイベントのライブ配信。',
+    descESPN5: '国際スポーツイベントのライブ配信。',
+    descESPN6: '国際スポーツイベントのライブ配信。',
+    descESPN7: '国際スポーツイベントのライブ配信。',
+    descESPNPremium: 'アルゼンチンサッカーの生中継。',
+    descDsports: 'ラ・リーガ独占、コパ・デル・レイ、FIFAイベント。',
+    descDsports2: '大陸選手権やFIFAイベントのサブ配信。',
+    descDsportsPlus: '大陸選手権やFIFAイベントの特別配信。',
+    descFoxSports: 'コパ・リベルタドーレス、チャンピオンズリーグ、モータースポーツ。',
+    descFoxSports2: '大陸別リーグ、NFL、エクストリームスポーツ。',
+    descFoxSports3: 'F1とモータースポーツ特別中継。',
+    descTycSports: 'アルゼンチンサッカー、ナショナルカップ、国内スポーツ。',
+    descLiga1Max: 'ペループロサッカーの生中継。',
+    descCaracol: 'コロンビアのサッカーとスポーツの生中継。',
+    descWinSports: 'コロンビアのサッカーとスポーツの生中継。',
+    loadingChannels: 'ライブチャンネルのステータスを更新中...',
+    noActiveChannels: 'アクティブな配信チャンネルはありません',
+    checkBackLater: 'サッカーの試合が開催されている時間帯に再度ご確認ください。',
+    selectChannel: '開始するにはチャンネルを選択してください',
+  },
+  KO: {
+    title: '실시간 중계 채널',
+    subtitle: '예정된 경기가 없는 경우에도 언제든지 스포츠 실시간 중계를 시청할 수 있습니다.',
+    availableSignals: '시청 가능한 채널',
+    playingNow: '현재 재생 중',
+    openExternal: '외부창에서 열기',
+    streamNoticeTitle: '중계 관련 안내',
+    streamNoticeDesc: '이 신호는 {provider}에서 외부적으로 제공됩니다. 원본 플레이어의 팝업 광고를 방지하려면 브라우저에서 광고 차단기(AdBlocker)를 사용하는 것이 좋습니다.',
+    descESPN: '국제 축구, 챔피언스 리그, 유럽 리그.',
+    descESPN2: '테니스, 미국 리그 및 보조 중계.',
+    descESPN3: '특별 이벤트, 사이클링, 모터 스포츠.',
+    descESPN4: '국제 스포츠 이벤트 실시간 생중계.',
+    descESPN5: '국제 스포츠 이벤트 실시간 생중계.',
+    descESPN6: '국제 스포츠 이벤트 실시간 생중계.',
+    descESPN7: '국제 스포츠 이벤트 실시간 생중계.',
+    descESPNPremium: '아르헨티나 축구 실시간 생중계.',
+    descDsports: '라리가 독점, 코파 델 레이 및 FIFA 이벤트.',
+    descDsports2: '대륙별 토너먼트 및 FIFA 이벤트 서브 중계.',
+    descDsportsPlus: '대륙별 토너먼트 및 FIFA 이벤트 특별 중계.',
+    descFoxSports: '코파 리베르타도레스, 챔피언스 리그 및 모터스포츠.',
+    descFoxSports2: '대륙별 리그, NFL 및 익스트림 스포츠.',
+    descFoxSports3: '포뮬러 1 및 특별 모터스포츠 중계.',
+    descTycSports: '아르헨티나 축구, 내셔널 컵 및 국내 스포츠.',
+    descLiga1Max: '페루 프로 축구 실시간 생중계.',
+    descCaracol: '콜롬비아 축구 및 스포츠 생중계.',
+    descWinSports: '콜롬비아 축구 및 스포츠 생중계.',
+    loadingChannels: '실시간 채널 상태 업데이트 중...',
+    noActiveChannels: '활성화된 중계 채널이 없습니다',
+    checkBackLater: '축구 경기가 진행 중일 때 나중에 다시 확인해 주세요.',
+    selectChannel: '시작하려면 채널을 선택하세요',
   },
 };
 
@@ -217,15 +348,22 @@ export default function StreamsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const saved = localStorage.getItem('locale') || 'ES';
+    const saved = (localStorage.getItem('locale') || 'ES').toUpperCase();
+    console.log('StreamsPage: loaded locale from localStorage:', saved);
     setLang(saved);
 
     const handleLocaleChange = () => {
-      setLang(localStorage.getItem('locale') || 'ES');
+      const newLang = (localStorage.getItem('locale') || 'ES').toUpperCase();
+      console.log('StreamsPage: locale-changed event triggered, new lang:', newLang);
+      setLang(newLang);
     };
     window.addEventListener('locale-changed', handleLocaleChange);
     return () => window.removeEventListener('locale-changed', handleLocaleChange);
   }, []);
+
+  useEffect(() => {
+    console.log('StreamsPage: lang state changed to:', lang);
+  }, [lang]);
 
   useEffect(() => {
     const fetchStatuses = async () => {
@@ -278,7 +416,8 @@ export default function StreamsPage() {
   }, []);
 
   const t = (key: string) => {
-    return streamsTranslations[lang]?.[key] || streamsTranslations['ES']?.[key] || key;
+    const upperLang = lang.toUpperCase();
+    return streamsTranslations[upperLang]?.[key] || streamsTranslations['ES']?.[key] || key;
   };
 
   return (
@@ -297,14 +436,14 @@ export default function StreamsPage() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 gap-3">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
-          <span className="text-sm text-[var(--text-muted)] font-medium">Actualizando estado de los canales en vivo...</span>
+          <span className="text-sm text-[var(--text-muted)] font-medium">{t('loadingChannels')}</span>
         </div>
       ) : channels.length === 0 ? (
         <Card className="glass-card border-border/40">
           <CardContent className="text-center py-16 space-y-2">
             <Tv className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
-            <p className="text-[var(--text)] font-semibold">No hay canales de transmisión activos</p>
-            <p className="text-xs text-[var(--text-muted)] max-w-xs mx-auto">Vuelve a consultar más tarde cuando haya partidos de fútbol en juego.</p>
+            <p className="text-[var(--text)] font-semibold">{t('noActiveChannels')}</p>
+            <p className="text-xs text-[var(--text-muted)] max-w-xs mx-auto">{t('checkBackLater')}</p>
           </CardContent>
         </Card>
       ) : (
@@ -403,7 +542,7 @@ export default function StreamsPage() {
               <Card className="glass-card border-border/40 overflow-hidden shadow-2xl">
                 <div className="flex flex-col items-center justify-center p-20 gap-2">
                   <Info className="h-10 w-10 text-muted-foreground" />
-                  <span className="text-sm font-semibold text-[var(--text)]">Selecciona un canal para comenzar</span>
+                  <span className="text-sm font-semibold text-[var(--text)]">{t('selectChannel')}</span>
                 </div>
               </Card>
             )}
