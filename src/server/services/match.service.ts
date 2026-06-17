@@ -16,6 +16,7 @@ import {
   normalizeStanding,
 } from '@/lib/football-data/normalizers';
 import type { Match, WorldCupStanding } from '@/types/app.types';
+import { recalculatePointsForMatch } from '@/server/services/prediction.service';
 
 const supabase = () => createServiceClient();
 
@@ -208,6 +209,7 @@ export async function syncFixturesFromFootballData(): Promise<SyncResult> {
 /**
  * Sincroniza solo los partidos de hoy.
  * Llama cada 10-15 minutos (cron job sync-today-matches).
+ * Si un partido pasa a estado 'finished', recalcula los puntos automáticamente.
  */
 export async function syncTodayMatchesFromFootballData(): Promise<SyncResult> {
   const errors: string[] = [];
@@ -215,11 +217,19 @@ export async function syncTodayMatchesFromFootballData(): Promise<SyncResult> {
 
   try {
     const matchesResponse = await fetchTodayMatchesFromApi();
+    const sb = supabase();
 
     for (const apiMatch of matchesResponse.matches) {
       const normalized = normalizeFootballDataMatch(apiMatch);
 
-      const { error } = await supabase()
+      // Verificar el estado previo del partido en la BD
+      const { data: existingMatch } = await sb
+        .from('matches')
+        .select('id, status')
+        .eq('external_api_id', normalized.externalApiId)
+        .single();
+
+      const { error } = await sb
         .from('matches')
         .update({
           status: normalized.status,
@@ -236,6 +246,24 @@ export async function syncTodayMatchesFromFootballData(): Promise<SyncResult> {
         errors.push(`Match ${apiMatch.id}: ${error.message}`);
       } else {
         matchesSynced++;
+
+        // Si el partido acaba de finalizar, recalcular puntos de pronósticos
+        const justFinished =
+          normalized.status === 'finished' &&
+          existingMatch &&
+          existingMatch.status !== 'finished';
+
+        if (justFinished && existingMatch.id) {
+          try {
+            await recalculatePointsForMatch(existingMatch.id);
+          } catch (recalcErr) {
+            errors.push(
+              `Recalc points match ${existingMatch.id}: ${
+                recalcErr instanceof Error ? recalcErr.message : String(recalcErr)
+              }`,
+            );
+          }
+        }
       }
     }
   } catch (err) {

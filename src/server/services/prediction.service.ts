@@ -6,9 +6,32 @@
 import { createServiceClient } from '@/lib/supabase/server';
 import {
   calculatePredictionPoints,
+  DEFAULT_SCORING_CONFIG,
+  type ScoringConfig,
 } from '@/lib/scoring/calculator';
 
 const supabase = () => createServiceClient();
+
+/**
+ * Obtiene la configuración de puntuación de un grupo desde la BD.
+ * Si el grupo no tiene reglas configuradas, usa los valores por defecto.
+ */
+async function getGroupScoringConfig(groupId: string): Promise<ScoringConfig> {
+  const sb = supabase();
+  const { data: group } = await sb
+    .from('groups')
+    .select('scoring_exact_score, scoring_correct_result, scoring_goal_diff')
+    .eq('id', groupId)
+    .single();
+
+  if (!group) return DEFAULT_SCORING_CONFIG;
+
+  return {
+    EXACT_SCORE: group.scoring_exact_score ?? DEFAULT_SCORING_CONFIG.EXACT_SCORE,
+    CORRECT_RESULT: group.scoring_correct_result ?? DEFAULT_SCORING_CONFIG.CORRECT_RESULT,
+    GOAL_DIFFERENCE_BONUS: group.scoring_goal_diff ?? DEFAULT_SCORING_CONFIG.GOAL_DIFFERENCE_BONUS,
+  };
+}
 
 // ---- Bloqueo de pronósticos --------------------------------
 
@@ -72,19 +95,29 @@ export async function recalculatePointsForMatch(matchId: string): Promise<number
   // Obtener todos los pronósticos de este partido
   const { data: predictions, error: predError } = await sb
     .from('predictions')
-    .select('id, predicted_home_score, predicted_away_score')
+    .select('id, predicted_home_score, predicted_away_score, group_id')
     .eq('match_id', matchId);
 
   if (predError || !predictions) return 0;
 
   let updated = 0;
+  const configCache = new Map<string, ScoringConfig>();
 
   for (const pred of predictions) {
+    const config = configCache.has(pred.group_id)
+      ? configCache.get(pred.group_id)!
+      : await getGroupScoringConfig(pred.group_id);
+    
+    if (!configCache.has(pred.group_id)) {
+      configCache.set(pred.group_id, config);
+    }
+
     const score = calculatePredictionPoints(
       pred.predicted_home_score,
       pred.predicted_away_score,
       match.home_score,
       match.away_score,
+      config,
     );
 
     const { error } = await sb

@@ -1,7 +1,6 @@
 // =============================================================
 // lib/scoring/calculator.ts
 // Sistema de puntuación de pronósticos
-// Modifica SCORING_CONFIG para ajustar los puntos sin tocar la lógica
 // =============================================================
 
 export interface PredictionScore {
@@ -11,43 +10,46 @@ export interface PredictionScore {
   goalDifferenceHit: boolean;
 }
 
+export interface ScoringConfig {
+  EXACT_SCORE: number;
+  CORRECT_RESULT: number;
+  GOAL_DIFFERENCE_BONUS: number;
+}
+
 /**
- * Configuración centralizada del sistema de puntuación.
- * Edita estos valores para cambiar las reglas del juego.
+ * Configuración por defecto.
  */
-export const SCORING_CONFIG = {
-  /** Puntos por marcador exacto (ej: predice 2-1, resultado 2-1) */
+export const DEFAULT_SCORING_CONFIG: ScoringConfig = {
   EXACT_SCORE: 5,
-  /** Puntos por acertar el resultado sin marcador exacto (ej: predice 1-0, resultado 2-1) */
   CORRECT_RESULT: 3,
-  /** Puntos extra por acertar la diferencia de goles (bonus opcional) */
   GOAL_DIFFERENCE_BONUS: 1,
 } as const;
 
 /**
  * Calcula los puntos de un pronóstico dado el resultado real.
- *
- * Reglas:
- * 1. Marcador exacto → EXACT_SCORE (5 pts) — incluye resultado y diferencia
- * 2. Resultado correcto (mismo ganador o empate) → CORRECT_RESULT (3 pts)
- *    + bonus si diferencia de goles coincide → GOAL_DIFFERENCE_BONUS (1 pt)
- * 3. Pronóstico incorrecto → 0 pts
- *
+ * 
  * @param predictedHome - Goles predichos del equipo local
  * @param predictedAway - Goles predichos del equipo visitante
  * @param realHome - Goles reales del equipo local
  * @param realAway - Goles reales del equipo visitante
+ * @param config - Configuración de puntuación (usa la por defecto si no se proporciona)
  */
 export function calculatePredictionPoints(
-  predictedHome: number,
-  predictedAway: number,
-  realHome: number,
-  realAway: number,
+  predictedHome: number | string,
+  predictedAway: number | string,
+  realHome: number | string,
+  realAway: number | string,
+  config: ScoringConfig = DEFAULT_SCORING_CONFIG,
 ): PredictionScore {
+  const pHome = Number(predictedHome);
+  const pAway = Number(predictedAway);
+  const rHome = Number(realHome);
+  const rAway = Number(realAway);
+
   // --- Marcador exacto ---
-  if (predictedHome === realHome && predictedAway === realAway) {
+  if (pHome === rHome && pAway === rAway) {
     return {
-      points: SCORING_CONFIG.EXACT_SCORE,
+      points: config.EXACT_SCORE,
       exactScoreHit: true,
       resultHit: true,
       goalDifferenceHit: true,
@@ -55,18 +57,18 @@ export function calculatePredictionPoints(
   }
 
   // --- Determinar resultado (ganador o empate) ---
-  const realResult = getMatchResult(realHome, realAway);
-  const predResult = getMatchResult(predictedHome, predictedAway);
+  const realResult = getMatchResult(rHome, rAway);
+  const predResult = getMatchResult(pHome, pAway);
 
   if (realResult === predResult) {
     // Acertó el resultado — calcular bonus de diferencia de goles
-    const realDiff = Math.abs(realHome - realAway);
-    const predDiff = Math.abs(predictedHome - predictedAway);
+    const realDiff = Math.abs(rHome - rAway);
+    const predDiff = Math.abs(pHome - pAway);
     const goalDifferenceHit = realDiff === predDiff;
 
     const points =
-      SCORING_CONFIG.CORRECT_RESULT +
-      (goalDifferenceHit ? SCORING_CONFIG.GOAL_DIFFERENCE_BONUS : 0);
+      config.CORRECT_RESULT +
+      (goalDifferenceHit ? config.GOAL_DIFFERENCE_BONUS : 0);
 
     return {
       points,
@@ -96,10 +98,10 @@ function getMatchResult(home: number, away: number): MatchResult {
 /**
  * Formatea el desglose de puntos de un pronóstico para mostrar en UI.
  */
-export function formatPointsBreakdown(score: PredictionScore): string {
-  if (score.exactScoreHit) return '🎯 Marcador exacto (+5 pts)';
+export function formatPointsBreakdown(score: PredictionScore, config: ScoringConfig = DEFAULT_SCORING_CONFIG): string {
+  if (score.exactScoreHit) return `🎯 Marcador exacto (+${config.EXACT_SCORE} pts)`;
   if (score.resultHit && score.goalDifferenceHit)
-    return '✅ Resultado + diferencia (+4 pts)';
-  if (score.resultHit) return '✅ Resultado correcto (+3 pts)';
+    return `✅ Resultado + diferencia (+${config.CORRECT_RESULT + config.GOAL_DIFFERENCE_BONUS} pts)`;
+  if (score.resultHit) return `✅ Resultado correcto (+${config.CORRECT_RESULT} pts)`;
   return '❌ Sin puntos';
 }
