@@ -447,59 +447,61 @@ export default function StreamsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:h-[calc(100vh-210px)] items-stretch">
           {/* Lista de canales */}
-          <div className="lg:col-span-1 space-y-3 lg:max-h-[600px] lg:overflow-y-auto overflow-x-auto flex flex-row lg:flex-col gap-3 lg:gap-0 pb-3 lg:pb-0 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent overscroll-behavior-x-contain -webkit-overflow-scrolling-touch">
+          <div className="lg:col-span-1 flex flex-col min-h-0 h-full">
             <div className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider px-1 mb-2 hidden lg:block">
               {t('availableSignals')}
             </div>
-            {channels.map((ch, idx) => {
-              const isSelected = activeChannel?.url === ch.url;
-              return (
-                <Card
-                  key={idx}
-                  onClick={() => setActiveChannel(ch)}
-                  className={cn(
-                    'cursor-pointer border transition-all hover:bg-[var(--surface-hover)] flex-shrink-0 w-[260px] lg:w-full lg:mb-3',
-                    isSelected 
-                      ? 'bg-primary/5 border-primary/45 shadow-md shadow-primary/5' 
-                      : 'glass-card border-border/40'
-                  )}
-                >
-                  <CardContent className="p-4 flex items-center justify-between gap-4 h-full">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="relative flex h-2 w-2 flex-shrink-0">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+            <div className="flex-1 lg:h-0 overflow-y-auto overflow-x-auto flex flex-row lg:flex-col gap-3 pb-3 lg:pb-0 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent overscroll-behavior-x-contain -webkit-overflow-scrolling-touch">
+              {channels.map((ch, idx) => {
+                const isSelected = activeChannel?.url === ch.url;
+                return (
+                  <Card
+                    key={idx}
+                    onClick={() => setActiveChannel(ch)}
+                    className={cn(
+                      'cursor-pointer border transition-all hover:bg-[var(--surface-hover)] flex-shrink-0 w-[260px] lg:w-full lg:mb-3',
+                      isSelected 
+                        ? 'bg-primary/5 border-primary/45 shadow-md shadow-primary/5' 
+                        : 'glass-card border-border/40'
+                    )}
+                  >
+                    <CardContent className="p-4 flex items-center justify-between gap-4 h-full">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="relative flex h-2 w-2 flex-shrink-0">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                          </span>
+                          <h3 className={cn('font-bold text-sm truncate', isSelected ? 'text-primary' : 'text-[var(--text)]')}>
+                            {ch.name}
+                          </h3>
+                        </div>
+                        <p className="text-xs text-[var(--text-muted)] line-clamp-2">
+                          {t(ch.descKey)}
+                        </p>
+                        <span className="inline-block mt-2 text-[9px] px-1.5 py-0.5 rounded bg-[var(--surface-hover)] border border-[var(--border-subtle)] text-[var(--text-muted)] font-semibold">
+                          {ch.category}
                         </span>
-                        <h3 className={cn('font-bold text-sm truncate', isSelected ? 'text-primary' : 'text-[var(--text)]')}>
-                          {ch.name}
-                        </h3>
                       </div>
-                      <p className="text-xs text-[var(--text-muted)] line-clamp-2">
-                        {t(ch.descKey)}
-                      </p>
-                      <span className="inline-block mt-2 text-[9px] px-1.5 py-0.5 rounded bg-[var(--surface-hover)] border border-[var(--border-subtle)] text-[var(--text-muted)] font-semibold">
-                        {ch.category}
-                      </span>
-                    </div>
-                    <div className={cn(
-                      'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors',
-                      isSelected ? 'bg-primary/20 text-primary' : 'bg-[var(--surface-hover)] border border-[var(--border-subtle)] text-[var(--text-muted)]'
-                    )}>
-                      <Play className="h-4 w-4 fill-current" />
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                      <div className={cn(
+                        'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors',
+                        isSelected ? 'bg-primary/20 text-primary' : 'bg-[var(--surface-hover)] border border-[var(--border-subtle)] text-[var(--text-muted)]'
+                      )}>
+                        <Play className="h-4 w-4 fill-current" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
 
           {/* Reproductor principal */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 flex flex-col min-h-0 h-full">
             {activeChannel ? (
-              <Card className="glass-card border-border/40 overflow-hidden shadow-2xl">
+              <Card className="glass-card border-border/40 overflow-hidden shadow-2xl flex flex-col h-full min-h-0">
                 <div className="p-4 bg-[var(--surface-hover)] border-b border-[var(--border-subtle)] flex items-center justify-between gap-4">
                   <div className="min-w-0">
                     <span className="text-xs text-[var(--text-muted)]">{t('playingNow')}</span>
@@ -517,7 +519,7 @@ export default function StreamsPage() {
                 </div>
 
                 {/* Video Player */}
-                <div className="relative aspect-video w-full bg-black">
+                <div className="relative flex-1 bg-black min-h-0">
                   <iframe
                     src={activeChannel.url}
                     className="absolute inset-0 w-full h-full border-none"
@@ -539,7 +541,7 @@ export default function StreamsPage() {
                 </div>
               </Card>
             ) : (
-              <Card className="glass-card border-border/40 overflow-hidden shadow-2xl">
+              <Card className="glass-card border-border/40 overflow-hidden shadow-2xl flex flex-col h-full min-h-0 justify-center">
                 <div className="flex flex-col items-center justify-center p-20 gap-2">
                   <Info className="h-10 w-10 text-muted-foreground" />
                   <span className="text-sm font-semibold text-[var(--text)]">{t('selectChannel')}</span>
