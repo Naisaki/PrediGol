@@ -288,82 +288,110 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent showCloseButton={false} className="max-w-[92vw] sm:max-w-4xl w-full bg-[var(--surface)] border-border/40 p-0 overflow-hidden shadow-2xl rounded-2xl">
-          <DialogHeader className="p-4 pr-10 sm:pr-4 bg-[var(--surface-hover)] border-b border-[var(--border-subtle)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative">
-            <div className="flex-1 min-w-0 pr-2 sm:pr-0">
-              <DialogTitle className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
-                <span className="relative flex h-2 w-2 flex-shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                </span>
-                <span className="truncate">{translateTeamName(homeTeam, lang)} vs {translateTeamName(awayTeam, lang)}</span>
-              </DialogTitle>
-              <DialogDescription className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
-                <span>{t('activeChannel')}</span>
-                <span className="text-primary font-semibold truncate max-w-[150px] sm:max-w-xs">{activeChannel.name || t('loading')}</span>
-              </DialogDescription>
+        <DialogContent 
+          showCloseButton={false} 
+          className="max-w-[95vw] sm:max-w-4xl w-full max-h-[96vh] sm:max-h-none flex flex-col bg-[var(--surface)] border-border/40 p-0 overflow-hidden shadow-2xl rounded-2xl"
+        >
+          {/* Header Responsivo sin superposiciones absolutas */}
+          <DialogHeader className="p-3 sm:p-4 bg-[var(--surface-hover)] border-b border-[var(--border-subtle)] flex flex-col gap-3 relative">
+            {/* Fila Superior: Título y Botón Cerrar (en móvil se sientan juntos en una fila dedicada) */}
+            <div className="flex items-center justify-between w-full gap-2">
+              <div className="flex-1 min-w-0">
+                <DialogTitle className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                  <span className="relative flex h-2 w-2 flex-shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                  </span>
+                  <span className="truncate block">
+                    {translateTeamName(homeTeam, lang)} vs {translateTeamName(awayTeam, lang)}
+                  </span>
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
+                  <span className="flex-shrink-0">{t('activeChannel')}</span>
+                  <span className="text-primary font-semibold truncate max-w-[140px] sm:max-w-xs">
+                    {activeChannel.name || t('loading')}
+                  </span>
+                </DialogDescription>
+              </div>
+
+              {/* Botón de cerrar fijo a la derecha en flujo normal en móvil */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/10 rounded-full flex-shrink-0 cursor-pointer"
+                onClick={() => {
+                  setIsOpen(false);
+                  setShowDropdown(false);
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </div>
 
-            <div className="flex items-center gap-2 z-50">
-              <div className="relative">
+            {/* Fila Inferior: Controles de Señal */}
+            <div className="flex items-center gap-2 w-full sm:w-auto sm:absolute sm:right-14 sm:top-1/2 sm:-translate-y-1/2 z-50">
+              <div className="relative flex-1 sm:flex-initial">
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}
                   disabled={loadingSchedule}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--control-bg)] border border-[var(--border-subtle)] text-xs font-semibold text-foreground hover:bg-[var(--surface-hover)] transition-colors disabled:opacity-50 cursor-pointer"
+                  className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start gap-2 px-3 py-1.5 rounded-lg bg-[var(--control-bg)] border border-[var(--border-subtle)] text-xs font-semibold text-foreground hover:bg-[var(--surface-hover)] transition-colors disabled:opacity-50 cursor-pointer shadow-sm"
                 >
-                  <span>{t('changeSignal')}</span>
-                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+                  <span className="truncate">{t('changeSignal')}</span>
+                  <ChevronDown className={`h-3.5 w-3.5 flex-shrink-0 transition-transform duration-200 ${showDropdown ? 'rotate-180' : ''}`} />
                 </button>
 
                 {showDropdown && (
-                  <div className="absolute right-0 mt-1.5 w-64 rounded-xl bg-[var(--surface)] border border-border/40 shadow-xl overflow-y-auto max-h-[300px] py-1 z-50">
-                    {channelsList.some(c => c.isRecommended) && (
-                      <>
-                        <div className="px-3 py-1 text-[10px] font-bold text-primary uppercase border-b border-border/20 mb-1 flex items-center gap-1">
-                          <Radio className="h-3 w-3 animate-pulse text-primary" />
-                          {t('liveSignalsForMatch')}
-                        </div>
-                        {channelsList.filter(c => c.isRecommended).map((ch, idx) => (
-                          <button
-                            key={`rec-${idx}`}
-                            onClick={() => {
-                              setActiveChannel(ch);
-                              setShowDropdown(false);
-                            }}
-                            className={`w-full text-left px-3 py-2 text-xs transition-colors flex flex-col cursor-pointer ${
-                              activeChannel.url === ch.url 
-                                ? 'bg-primary/15 text-primary font-bold' 
-                                : 'text-[var(--text)] hover:bg-[var(--surface-hover)]'
-                            }`}
-                          >
-                            <span className="truncate">{ch.name}</span>
-                            <span className="text-[9px] text-[var(--text-muted)] font-normal">vía {ch.provider}</span>
-                          </button>
-                        ))}
-                        <div className="h-[1px] bg-[var(--border-subtle)] my-2" />
-                      </>
-                    )}
+                  <div className="absolute left-0 sm:left-auto sm:right-0 mt-2 w-72 sm:w-64 rounded-2xl bg-[var(--surface)]/95 backdrop-blur-md border border-border/30 shadow-2xl shadow-black/40 overflow-hidden z-50 transition-all">
+                    {/* Contenedor Interior con scroll y scrollbar estilizada Webkit */}
+                    <div className="overflow-y-auto max-h-[260px] p-1.5 flex flex-col gap-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-foreground/10 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-foreground/20 pr-1">
+                      {channelsList.some(c => c.isRecommended) && (
+                        <>
+                          <div className="px-3 py-1 text-[10px] font-bold text-primary uppercase border-b border-border/10 mb-1 flex items-center gap-1">
+                            <Radio className="h-3 w-3 animate-pulse text-primary" />
+                            {t('liveSignalsForMatch')}
+                          </div>
+                          {channelsList.filter(c => c.isRecommended).map((ch, idx) => (
+                            <button
+                              key={`rec-${idx}`}
+                              onClick={() => {
+                                setActiveChannel(ch);
+                                setShowDropdown(false);
+                              }}
+                              className={`w-full text-left px-3 py-2 text-xs rounded-xl transition-all flex flex-col cursor-pointer hover:scale-[1.01] ${
+                                activeChannel.url === ch.url 
+                                  ? 'bg-primary/15 text-primary border-l-2 border-primary font-bold pl-2.5' 
+                                  : 'text-[var(--text)] hover:bg-[var(--surface-hover)]'
+                              }`}
+                            >
+                              <span className="truncate font-semibold">{ch.name}</span>
+                              <span className="text-[9px] text-[var(--text-muted)] font-normal">vía {ch.provider}</span>
+                            </button>
+                          ))}
+                          <div className="h-[1px] bg-[var(--border-subtle)] my-1 opacity-50" />
+                        </>
+                      )}
 
-                    <div className="px-3 py-1 text-[10px] font-bold text-[var(--text-muted)] uppercase border-b border-border/20 mb-1">
-                      {t('allSportsSignals')}
+                      <div className="px-3 py-1 text-[10px] font-bold text-[var(--text-muted)] uppercase border-b border-border/10 mb-1">
+                        {t('allSportsSignals')}
+                      </div>
+                      {channelsList.filter(c => !c.isRecommended).map((ch, idx) => (
+                        <button
+                          key={`gen-${idx}`}
+                          onClick={() => {
+                            setActiveChannel(ch);
+                            setShowDropdown(false);
+                          }}
+                          className={`w-full text-left px-3 py-2 text-xs rounded-xl transition-all flex flex-col cursor-pointer hover:scale-[1.01] ${
+                            activeChannel.url === ch.url 
+                              ? 'bg-primary/15 text-primary border-l-2 border-primary font-bold pl-2.5' 
+                              : 'text-[var(--text)] hover:bg-[var(--surface-hover)]'
+                          }`}
+                        >
+                          <span className="truncate font-semibold">{ch.name}</span>
+                          <span className="text-[9px] text-[var(--text-muted)] font-normal">vía {ch.provider}</span>
+                        </button>
+                      ))}
                     </div>
-                    {channelsList.filter(c => !c.isRecommended).map((ch, idx) => (
-                      <button
-                        key={`gen-${idx}`}
-                        onClick={() => {
-                          setActiveChannel(ch);
-                          setShowDropdown(false);
-                        }}
-                        className={`w-full text-left px-3 py-2 text-xs transition-colors flex flex-col cursor-pointer ${
-                          activeChannel.url === ch.url 
-                            ? 'bg-primary/15 text-primary font-bold' 
-                            : 'text-[var(--text)] hover:bg-[var(--surface-hover)]'
-                        }`}
-                      >
-                        <span className="truncate">{ch.name}</span>
-                        <span className="text-[9px] text-[var(--text-muted)] font-normal">vía {ch.provider}</span>
-                      </button>
-                    ))}
                   </div>
                 )}
               </div>
@@ -373,28 +401,17 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
                   href={activeChannel.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/20 border border-primary/30 text-xs font-semibold text-primary hover:bg-primary/35 transition-colors"
+                  className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/20 border border-primary/30 text-xs font-semibold text-primary hover:bg-primary/35 transition-colors flex-1 sm:flex-initial"
                 >
                   <Tv className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{t('fullScreen')}</span>
+                  <span className="inline">{t('fullScreen')}</span>
                 </a>
               )}
             </div>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-3 right-3 h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/10 rounded-full flex-shrink-0 z-50 cursor-pointer"
-              onClick={() => {
-                setIsOpen(false);
-                setShowDropdown(false);
-              }}
-            >
-              <X className="h-4 w-4" />
-            </Button>
           </DialogHeader>
 
-          <div className="relative aspect-video w-full bg-black">
+          {/* Contenedor del video flexible con límite de altura para landscape/pantallas pequeñas */}
+          <div className="relative aspect-video w-full max-h-[50vh] sm:max-h-[60vh] md:max-h-[70vh] bg-black min-h-[180px]">
             {loadingSchedule ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 gap-3">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -417,7 +434,7 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
             )}
           </div>
           
-          <div className="bg-[var(--surface-hover)] border-t border-[var(--border-subtle)] px-4 py-2.5 flex items-center gap-2.5 text-[10px] text-muted-foreground">
+          <div className="bg-[var(--surface-hover)] border-t border-[var(--border-subtle)] px-4 py-2.5 flex items-center gap-2.5 text-[10px] text-muted-foreground flex-shrink-0">
             <ShieldAlert className="h-4 w-4 text-amber-500 flex-shrink-0" />
             <span className="truncate">
               {t('notice').replace('{provider}', activeChannel.provider || 'la18hd.com')}
