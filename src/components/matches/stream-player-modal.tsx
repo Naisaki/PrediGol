@@ -63,9 +63,9 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent showCloseButton={false} className="sm:max-w-4xl w-full bg-slate-950 border-border/40 p-0 overflow-hidden shadow-2xl rounded-2xl">
+        <DialogContent showCloseButton={false} className="sm:max-w-4xl w-full bg-[var(--surface)] border-border/40 p-0 overflow-hidden shadow-2xl rounded-2xl">
           {/* Header */}
-          <DialogHeader className="p-4 bg-slate-900 border-b border-border/20 flex flex-row items-center justify-between gap-4">
+          <DialogHeader className="p-4 bg-[var(--surface-hover)] border-b border-[var(--border-subtle)] flex flex-row items-center justify-between gap-4">
             <div className="flex-1 min-w-0">
               <DialogTitle className="text-base font-bold text-foreground flex items-center gap-2">
                 <span className="relative flex h-2 w-2 flex-shrink-0">
@@ -86,14 +86,14 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
               <div className="relative">
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-border/30 text-xs font-semibold text-foreground hover:bg-slate-750 transition-colors"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--control-bg)] border border-[var(--border-subtle)] text-xs font-semibold text-foreground hover:bg-[var(--surface-hover)] transition-colors"
                 >
                   <span>Cambiar de canal</span>
                   <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
                 </button>
 
                 {showDropdown && (
-                  <div className="absolute right-0 mt-1.5 w-56 rounded-xl bg-slate-900 border border-border/40 shadow-xl overflow-y-auto max-h-[280px] py-1">
+                  <div className="absolute right-0 mt-1.5 w-56 rounded-xl bg-[var(--surface)] border border-border/40 shadow-xl overflow-y-auto max-h-[280px] py-1">
                     <div className="px-3 py-1 text-[10px] font-bold text-muted-foreground uppercase border-b border-border/20 mb-1">
                       Señales Disponibles
                     </div>
@@ -107,7 +107,7 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
                         className={`w-full text-left px-3 py-2 text-xs transition-colors flex flex-col ${
                           activeChannel.url === ch.url 
                             ? 'bg-primary/10 text-primary font-semibold' 
-                            : 'text-muted-foreground hover:bg-slate-800 hover:text-foreground'
+                            : 'text-muted-foreground hover:bg-[var(--surface-hover)] hover:text-foreground'
                         }`}
                       >
                         <span>{ch.name}</span>
@@ -155,7 +155,7 @@ export function StreamPlayerModal({ streamUrl, homeTeam, awayTeam }: StreamPlaye
           </div>
           
           {/* Aviso estático de seguridad */}
-          <div className="bg-slate-900 border-t border-border/20 px-4 py-2.5 flex items-center gap-2.5 text-[10px] text-muted-foreground">
+          <div className="bg-[var(--surface-hover)] border-t border-[var(--border-subtle)] px-4 py-2.5 flex items-center gap-2.5 text-[10px] text-muted-foreground">
             <ShieldAlert className="h-4 w-4 text-amber-500 flex-shrink-0" />
             <span>
               Aviso: Señal provista por {activeChannel.provider}. Utiliza un adblocker si experimentas exceso de anuncios emergentes del reproductor de origen.
