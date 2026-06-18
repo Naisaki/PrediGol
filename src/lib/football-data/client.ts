@@ -146,12 +146,22 @@ export async function getCompetitionMatches(
   });
 }
 
-/** Obtiene partidos de hoy de la competición */
+/** Obtiene partidos de hoy, ayer y mañana de la competición para evitar desfases de zona horaria */
 export async function getTodayMatches(): Promise<FDMatchesResponse> {
-  const today = new Date().toLocaleDateString('sv-SE'); // Formato YYYY-MM-DD en hora local del servidor
+  const now = new Date();
+  
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
+
+  const dateFrom = yesterday.toLocaleDateString('sv-SE');
+  const dateTo = tomorrow.toLocaleDateString('sv-SE');
+
   return requestFootballData<FDMatchesResponse>({
     endpoint: `/competitions/${COMPETITION_CODE}/matches`,
-    params: { dateFrom: today, dateTo: today },
+    params: { dateFrom, dateTo },
   });
 }
 
