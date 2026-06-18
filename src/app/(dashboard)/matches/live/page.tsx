@@ -38,13 +38,7 @@ export default async function LiveMatchesPage() {
   const dbError = matchesError || syncError ? { matchesError, syncError } : null;
 
   const lastSync = syncLogs && syncLogs.length > 0 ? syncLogs[0] : null;
-
-  const lastSyncTime = lastSync?.completed_at
-    ? new Date(lastSync.completed_at).toLocaleTimeString('es', {
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    : null;
+  const lastSyncTime = lastSync?.completed_at ?? null;
 
   return (
     <LiveMatchesClient 

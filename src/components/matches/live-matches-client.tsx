@@ -232,6 +232,20 @@ export function LiveMatchesClient({ initialMatches, lastSyncTime, dbError }: Liv
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [lang, setLang] = useState('ES');
+  const [formattedSyncTime, setFormattedSyncTime] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (lastSyncTime) {
+      setFormattedSyncTime(
+        new Date(lastSyncTime).toLocaleTimeString('es', {
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      );
+    } else {
+      setFormattedSyncTime(null);
+    }
+  }, [lastSyncTime]);
 
   useEffect(() => {
     const saved = localStorage.getItem('locale') || 'ES';
@@ -313,7 +327,7 @@ export function LiveMatchesClient({ initialMatches, lastSyncTime, dbError }: Liv
               <span>{t('viewStreams')}</span>
             </Button>
           </Link>
-          {lastSyncTime && (
+          {formattedSyncTime && (
             <button
               onClick={() => {
                 startTransition(() => {
@@ -325,7 +339,7 @@ export function LiveMatchesClient({ initialMatches, lastSyncTime, dbError }: Liv
               title="Refrescar partidos"
             >
               <RefreshCw className={cn("h-3.5 w-3.5", isPending ? "animate-spin" : "animate-spin-slow")} />
-              <span>{t('updatedAt')} {lastSyncTime}</span>
+              <span>{t('updatedAt')} {formattedSyncTime}</span>
             </button>
           )}
         </div>
