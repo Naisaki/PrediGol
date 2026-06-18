@@ -148,7 +148,7 @@ export async function getCompetitionMatches(
 
 /** Obtiene partidos de hoy de la competición */
 export async function getTodayMatches(): Promise<FDMatchesResponse> {
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toLocaleDateString('sv-SE'); // Formato YYYY-MM-DD en hora local del servidor
   return requestFootballData<FDMatchesResponse>({
     endpoint: `/competitions/${COMPETITION_CODE}/matches`,
     params: { dateFrom: today, dateTo: today },

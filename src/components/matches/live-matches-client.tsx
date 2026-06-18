@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useTransition } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Radio, Clock, RefreshCw, Tv } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ApiDelayNotice } from '@/components/common/api-delay-notice';
@@ -228,6 +229,8 @@ const stageTranslations: Record<string, Record<string, string>> = {
 };
 
 export function LiveMatchesClient({ initialMatches, lastSyncTime, dbError }: LiveMatchesClientProps) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [lang, setLang] = useState('ES');
 
   useEffect(() => {
@@ -240,6 +243,19 @@ export function LiveMatchesClient({ initialMatches, lastSyncTime, dbError }: Liv
     window.addEventListener('locale-changed', handleLocaleChange);
     return () => window.removeEventListener('locale-changed', handleLocaleChange);
   }, []);
+
+  // Polling automático cada 30 segundos si la ventana está activa
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        startTransition(() => {
+          router.refresh();
+        });
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [router]);
 
   const t = (key: string) => {
     return liveTranslations[lang]?.[key] || liveTranslations['ES']?.[key] || key;
@@ -298,10 +314,19 @@ export function LiveMatchesClient({ initialMatches, lastSyncTime, dbError }: Liv
             </Button>
           </Link>
           {lastSyncTime && (
-            <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
-              <RefreshCw className="h-3 w-3 animate-spin-slow" />
-              {t('updatedAt')} {lastSyncTime}
-            </div>
+            <button
+              onClick={() => {
+                startTransition(() => {
+                  router.refresh();
+                });
+              }}
+              disabled={isPending}
+              className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-primary transition-colors disabled:opacity-50 cursor-pointer bg-transparent border-none p-1"
+              title="Refrescar partidos"
+            >
+              <RefreshCw className={cn("h-3.5 w-3.5", isPending ? "animate-spin" : "animate-spin-slow")} />
+              <span>{t('updatedAt')} {lastSyncTime}</span>
+            </button>
           )}
         </div>
       </div>
