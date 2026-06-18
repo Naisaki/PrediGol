@@ -201,6 +201,17 @@ export function PredictionCard({
                   max={20}
                   value={homeScore}
                   onChange={(e) => setHomeScore(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (['e', 'E', '+', '-', '.', ','].includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
+                  onPaste={(e) => {
+                    const paste = e.clipboardData.getData('text');
+                    if (!/^\d+$/.test(paste)) {
+                      e.preventDefault();
+                    }
+                  }}
                   className="score-input"
                   placeholder="0"
                   disabled={isLocked}
@@ -213,6 +224,17 @@ export function PredictionCard({
                   max={20}
                   value={awayScore}
                   onChange={(e) => setAwayScore(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (['e', 'E', '+', '-', '.', ','].includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
+                  onPaste={(e) => {
+                    const paste = e.clipboardData.getData('text');
+                    if (!/^\d+$/.test(paste)) {
+                      e.preventDefault();
+                    }
+                  }}
                   className="score-input"
                   placeholder="0"
                   disabled={isLocked}
