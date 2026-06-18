@@ -3,7 +3,7 @@
 // Partidos En Vivo (Estado in_play o paused)
 // =============================================================
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { LiveMatchesClient } from '@/components/matches/live-matches-client';
 import type { Metadata } from 'next';
 
@@ -12,6 +12,7 @@ export const revalidate = 10; // Revalidar cada 10 segundos en vivo
 
 export default async function LiveMatchesPage() {
   const supabase = await createClient();
+  const serviceSupabase = createServiceClient();
 
   // Obtener solo partidos en juego (in_play) o descanso (paused)
   const [matchesResult, syncLogsResult] = await Promise.all([
@@ -20,7 +21,7 @@ export default async function LiveMatchesPage() {
       .select('id, home_team_name, away_team_name, home_team_crest, away_team_crest, kickoff_time, status, home_score, away_score, winner, group_name, stage, last_updated_from_api, manually_updated, stream_url')
       .in('status', ['in_play', 'paused'])
       .order('kickoff_time', { ascending: true }),
-    supabase
+    serviceSupabase
       .from('sync_logs')
       .select('completed_at')
       .eq('sync_type', 'today_matches')
