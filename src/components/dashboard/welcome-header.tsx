@@ -3,12 +3,12 @@
 import React, { useEffect, useState } from 'react';
 
 const translations: Record<string, { welcome: string; subtitle: string }> = {
-  ES: { welcome: '¡Hola, {name}! 👋', subtitle: 'Bienvenido al Mundial Predictor FIFA 2026' },
-  EN: { welcome: 'Hello, {name}! 👋', subtitle: 'Welcome to FIFA World Cup Predictor 2026' },
-  FR: { welcome: 'Bonjour, {name}! 👋', subtitle: 'Bienvenue au Pronostiqueur de la Coupe du Monde FIFA 2026' },
-  IT: { welcome: 'Ciao, {name}! 👋', subtitle: 'Benvenuto nel Pronosticatore della Coppa del Mondo FIFA 2026' },
-  JA: { welcome: 'こんにちは、{name}さん! 👋', subtitle: 'FIFAワールドカップ2026予想サイトへようこそ' },
-  KO: { welcome: '안녕하세요, {name}님! 👋', subtitle: 'FIFA 월드컵 2026 예측에 오신 것을 환영합니다' },
+  ES: { welcome: '¡Hola, {name}! 👋', subtitle: 'Bienvenido a Goleados FIFA 2026' },
+  EN: { welcome: 'Hello, {name}! 👋', subtitle: 'Welcome to Goleados FIFA 2026' },
+  FR: { welcome: 'Bonjour, {name}! 👋', subtitle: 'Bienvenue sur Goleados FIFA 2026' },
+  IT: { welcome: 'Ciao, {name}! 👋', subtitle: 'Benvenuto su Goleados FIFA 2026' },
+  JA: { welcome: 'こんにちは、{name}さん! 👋', subtitle: 'Goleados FIFA 2026へようこそ' },
+  KO: { welcome: '안녕하세요, {name}님! 👋', subtitle: 'Goleados FIFA 2026에 오신 것을 환영합니다' },
 };
 
 export function WelcomeHeader({ name }: { name: string }) {

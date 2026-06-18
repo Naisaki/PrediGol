@@ -118,7 +118,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
               <Trophy className="h-5 w-5 text-primary" />
             </div>
             <span className="font-bold tracking-tight text-[var(--text)] text-base select-none">
-              Mundial<span className="text-primary font-black">Predictor</span>
+              Gole<span className="text-primary font-black">ados</span>
             </span>
           </Link>
         </div>

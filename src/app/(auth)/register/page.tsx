@@ -40,7 +40,7 @@ type FormData = z.infer<typeof schema>;
 const registerTranslations: Record<string, Record<string, string>> = {
   ES: {
     title: 'Crear cuenta',
-    subtitle: 'Únete a la beta privada de Mundial Predictor',
+    subtitle: 'Únete a la beta privada de Goleados',
     emailLabel: 'Dirección de Email',
     usernameLabel: 'Nombre de usuario',
     fullNameLabel: 'Nombre completo',
@@ -56,7 +56,7 @@ const registerTranslations: Record<string, Record<string, string>> = {
   },
   EN: {
     title: 'Create Account',
-    subtitle: 'Join the private beta of Mundial Predictor',
+    subtitle: 'Join the private beta of Goleados',
     emailLabel: 'Email Address',
     usernameLabel: 'Username',
     fullNameLabel: 'Full Name',
@@ -72,7 +72,7 @@ const registerTranslations: Record<string, Record<string, string>> = {
   },
   FR: {
     title: 'Créer un compte',
-    subtitle: 'Rejoignez la bêta privée de Mundial Predictor',
+    subtitle: 'Rejoignez la bêta privée de Goleados',
     emailLabel: 'Adresse E-mail',
     usernameLabel: "Nom d'utilisateur",
     fullNameLabel: 'Nom complet',
@@ -88,7 +88,7 @@ const registerTranslations: Record<string, Record<string, string>> = {
   },
   IT: {
     title: 'Crea un account',
-    subtitle: 'Partecipa alla beta privata di Mundial Predictor',
+    subtitle: 'Partecipa alla beta privata di Goleados',
     emailLabel: 'Indirizzo E-mail',
     usernameLabel: 'Nome utente',
     fullNameLabel: 'Nome completo',
@@ -104,7 +104,7 @@ const registerTranslations: Record<string, Record<string, string>> = {
   },
   JA: {
     title: 'アカウント作成',
-    subtitle: 'Mundial Predictorのプライベートベータに参加',
+    subtitle: 'Goleadosのプライベートベータに参加',
     emailLabel: 'メールアドレス',
     usernameLabel: 'ユーザー名',
     fullNameLabel: 'フルネーム',
@@ -120,7 +120,7 @@ const registerTranslations: Record<string, Record<string, string>> = {
   },
   KO: {
     title: '회원가입',
-    subtitle: 'Mundial Predictor 프라이빗 베타 참여',
+    subtitle: 'Goleados 프라이빗 베타 참여',
     emailLabel: '이메일 주소',
     usernameLabel: '사용자 이름',
     fullNameLabel: '이름',
@@ -176,7 +176,7 @@ export default function RegisterPage() {
       return;
     }
 
-    toast.success('¡Cuenta creada! Bienvenido al Mundial Predictor.');
+    toast.success('¡Cuenta creada! Bienvenido a Goleados.');
     router.push('/dashboard');
     router.refresh();
   };

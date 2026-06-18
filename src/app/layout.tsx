@@ -13,14 +13,14 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Mundial Predictor — Pronósticos del Mundial FIFA 2026',
-    template: '%s | Mundial Predictor',
+    default: 'Goleados — Pronósticos del Mundial FIFA 2026',
+    template: '%s | Goleados',
   },
   description:
     'Crea tu grupo, invita a tus amigos, pronostica los partidos del Mundial FIFA 2026 y compite en una tabla de posiciones. Plataforma social y recreativa — sin apuestas.',
-  keywords: ['mundial', 'pronósticos', 'fútbol', 'FIFA 2026', 'predictor'],
+  keywords: ['mundial', 'pronósticos', 'fútbol', 'FIFA 2026', 'goleados', 'predictor'],
   openGraph: {
-    title: 'Mundial Predictor',
+    title: 'Goleados',
     description: 'Compite con tus amigos pronosticando el Mundial FIFA 2026',
     type: 'website',
   },

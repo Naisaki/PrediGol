@@ -70,7 +70,7 @@ export default async function JoinPage({ params }: PageProps) {
           className="inline-flex items-center gap-2 text-foreground/80 hover:text-foreground transition-colors"
         >
           <Trophy className="h-5 w-5 text-primary" />
-          <span className="font-bold tracking-tight">Mundial Predictor</span>
+          <span className="font-bold tracking-tight">Goleados</span>
         </Link>
       </div>
 

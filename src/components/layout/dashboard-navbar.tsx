@@ -336,7 +336,7 @@ export function DashboardNavbar({
             <Link href="/dashboard" className="flex items-center gap-2">
               <Trophy className="h-5 w-5 text-primary flex-shrink-0 animate-pulse" />
               <span className="font-bold text-sm tracking-tight text-[var(--text)] hidden sm:inline-block">
-                Predictor
+                Goleados
               </span>
             </Link>
           </div>

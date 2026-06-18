@@ -19,7 +19,7 @@ export function DashboardHeader({ username, avatarUrl }: DashboardHeaderProps) {
     <header className="lg:hidden sticky top-0 z-40 glass border-b border-white/5 h-14 flex items-center justify-between px-4">
       <Link href="/dashboard" className="flex items-center gap-2">
         <Trophy className="h-5 w-5 text-primary" />
-        <span className="font-bold tracking-tight text-sm">Mundial Predictor</span>
+        <span className="font-bold tracking-tight text-sm">Goleados</span>
       </Link>
 
       <div className="flex items-center gap-2">
