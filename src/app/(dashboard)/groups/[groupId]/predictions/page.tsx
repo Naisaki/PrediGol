@@ -3,6 +3,7 @@
 // Pronósticos del grupo para el usuario actual
 // =============================================================
 
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -21,12 +22,11 @@ interface PageProps {
 
 export default async function PredictionsPage({ params }: PageProps) {
   const { groupId } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { userId } = await auth();
 
-  if (!user) return null;
+  if (!userId) return null;
+
+  const supabase = await createClient();
 
   // Obtener grupo
   const group = await getGroupById(groupId);
@@ -36,7 +36,7 @@ export default async function PredictionsPage({ params }: PageProps) {
 
   // Verificar membresía
   const members = await getGroupMembers(groupId);
-  const currentMember = members.find((m) => m.userId === user.id);
+  const currentMember = members.find((m) => m.profile?.userId === userId || m.userId === userId);
   if (!currentMember) {
     notFound();
   }
@@ -49,7 +49,7 @@ export default async function PredictionsPage({ params }: PageProps) {
     .order('kickoff_time', { ascending: true });
 
   // Obtener pronósticos existentes del usuario en este grupo
-  const predictions = (await getUserPredictionsForGroup(user.id, groupId)) as any[];
+  const predictions = (await getUserPredictionsForGroup(userId, groupId)) as any[];
 
   return (
     <div className="space-y-6 animate-fade-in">

@@ -99,7 +99,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen w-full max-w-full flex flex-col bg-[var(--background)] relative overflow-x-hidden">
+    <div className="h-screen w-screen max-w-full flex flex-col bg-[var(--background)] relative overflow-hidden">
       {/* Background Grid Pattern Overlay */}
       <div className="absolute inset-0 pointer-events-none auth-grid-overlay opacity-80" />
       
@@ -108,7 +108,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] aspect-square rounded-full bg-primary/5 filter blur-[120px] pointer-events-none" />
 
       {/* Premium Header/Navbar */}
-      <header className="w-full h-16 flex items-center justify-between px-6 sm:px-12 border-b border-[var(--border-subtle)] bg-[var(--background)]/85 backdrop-blur-md z-40 relative">
+      <header className="w-full h-16 flex items-center justify-between px-4 sm:px-12 border-b border-[var(--border-subtle)] bg-[var(--background)]/85 backdrop-blur-md z-40 relative flex-shrink-0">
         <div className="flex items-center gap-2">
           <Link
             href="/"
@@ -166,8 +166,8 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex items-center justify-center px-4 py-12 z-30 relative min-h-0">
-        <div className="w-full max-w-[440px]">
+      <main className="flex-1 flex flex-col items-center justify-start p-4 z-30 relative overflow-y-auto overflow-x-hidden">
+        <div className="w-full max-w-[440px] my-auto py-4">
           {children}
         </div>
       </main>

@@ -3,7 +3,7 @@
 // Layout protegido del panel de configuración (solo owner)
 // =============================================================
 
-import { createClient } from '@/lib/supabase/server';
+import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { getGroupById, getGroupMembers } from '@/server/services/group.service';
 import { SettingsSidebar } from '@/components/groups/settings/settings-sidebar';
@@ -18,17 +18,16 @@ interface LayoutProps {
 
 export default async function GroupSettingsLayout({ params, children }: LayoutProps) {
   const { groupId } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { userId } = await auth();
 
-  if (!user) redirect('/login');
+  if (!userId) redirect('/login');
 
   const group = await getGroupById(groupId);
   if (!group) redirect('/groups');
 
   // Solo el owner puede acceder a settings
   const members = await getGroupMembers(groupId);
-  const currentMember = members.find((m) => m.userId === user.id);
+  const currentMember = members.find((m) => m.profile?.userId === userId || m.userId === userId);
   if (!currentMember || currentMember.role !== 'owner') {
     redirect(`/groups/${groupId}`);
   }

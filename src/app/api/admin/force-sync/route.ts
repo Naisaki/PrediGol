@@ -5,7 +5,8 @@
 // =============================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { auth } from '@clerk/nextjs/server';
+import { createServiceClient } from '@/lib/supabase/server';
 import {
   syncFixturesFromFootballData,
   syncTodayMatchesFromFootballData,
@@ -15,26 +16,31 @@ import {
 type SyncMode = 'fixtures' | 'today' | 'standings' | 'all';
 
 async function isPlatformAdmin(userId: string): Promise<boolean> {
-  const supabase = await createClient();
-  const { data } = await supabase
+  const serviceClient = createServiceClient();
+  const { data: profile } = await serviceClient
+    .from('profiles')
+    .select('user_id')
+    .eq('clerk_user_id', userId)
+    .maybeSingle();
+
+  if (!profile) return false;
+
+  const { data } = await serviceClient
     .from('user_roles')
     .select('role')
-    .eq('user_id', userId)
+    .eq('user_id', profile.user_id)
     .single();
   return data?.role === 'platform_admin';
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { userId } = await auth();
 
-  if (!user) {
+  if (!userId) {
     return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
   }
 
-  if (!(await isPlatformAdmin(user.id))) {
+  if (!(await isPlatformAdmin(userId))) {
     return NextResponse.json({ error: 'Acceso denegado' }, { status: 403 });
   }
 

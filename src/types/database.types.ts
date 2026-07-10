@@ -24,6 +24,8 @@ export type Database = {
           avatar_url: string | null;
           created_at: string;
           updated_at: string;
+          email: string | null;
+          clerk_user_id: string | null;
         };
         Insert: {
           id?: string;
@@ -33,6 +35,8 @@ export type Database = {
           avatar_url?: string | null;
           created_at?: string;
           updated_at?: string;
+          email?: string | null;
+          clerk_user_id?: string | null;
         };
         Update: {
           id?: string;
@@ -41,6 +45,8 @@ export type Database = {
           full_name?: string | null;
           avatar_url?: string | null;
           updated_at?: string;
+          email?: string | null;
+          clerk_user_id?: string | null;
         };
       };
       user_roles: {

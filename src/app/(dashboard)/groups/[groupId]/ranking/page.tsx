@@ -3,7 +3,7 @@
 // Tabla de posiciones del grupo
 // =============================================================
 
-import { createClient } from '@/lib/supabase/server';
+import { auth } from '@clerk/nextjs/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getGroupRanking, getGroupById, getGroupMembers } from '@/server/services/group.service';
@@ -21,12 +21,9 @@ interface PageProps {
 
 export default async function GroupRankingPage({ params }: PageProps) {
   const { groupId } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { userId } = await auth();
 
-  if (!user) return null;
+  if (!userId) return null;
 
   // Obtener grupo
   const group = await getGroupById(groupId);
@@ -36,12 +33,16 @@ export default async function GroupRankingPage({ params }: PageProps) {
 
   // Verificar membresía
   const members = await getGroupMembers(groupId);
-  const currentMember = members.find((m) => m.userId === user.id);
+  const currentMember = members.find((m) => m.profile?.userId === userId || m.userId === userId);
   if (!currentMember) {
     notFound();
   }
 
-  const ranking = await getGroupRanking(groupId);
+  const rawRanking = await getGroupRanking(groupId);
+  const ranking = rawRanking.map((entry, index) => ({
+    ...entry,
+    position: index + 1,
+  }));
 
   const podiumColors = [
     { border: 'border-yellow-400/50', bg: 'bg-yellow-400/10', text: 'text-yellow-400', icon: '🥇' },
@@ -76,7 +77,7 @@ export default async function GroupRankingPage({ params }: PageProps) {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {ranking.slice(0, 3).map((entry, idx) => {
                 const colors = podiumColors[idx];
-                const isCurrentUser = entry.userId === user.id;
+                const isCurrentUser = entry.userId === userId;
                 return (
                   <Card
                     key={entry.userId}
@@ -135,7 +136,7 @@ export default async function GroupRankingPage({ params }: PageProps) {
                   </thead>
                   <tbody>
                     {ranking.map((entry) => {
-                      const isCurrentUser = entry.userId === user.id;
+                      const isCurrentUser = entry.userId === userId;
                       return (
                         <tr
                           key={entry.userId}

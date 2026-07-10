@@ -3,7 +3,7 @@
 // Sección: Transferir Propiedad del Grupo
 // =============================================================
 
-import { createClient } from '@/lib/supabase/server';
+import { auth } from '@clerk/nextjs/server';
 import { getGroupMembers } from '@/server/services/group.service';
 import { SettingsSection } from '@/components/groups/settings/settings-section';
 import { TransferOwnershipForm } from '@/components/groups/settings/transfer-ownership-form';
@@ -14,13 +14,12 @@ interface PageProps {
 
 export default async function TransferOwnershipPage({ params }: PageProps) {
   const { groupId } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
+  const { userId } = await auth();
+  if (!userId) return null;
 
   const members = await getGroupMembers(groupId);
   // Excluir al owner actual de la lista de candidatos
-  const candidates = members.filter((m) => m.userId !== user.id && m.role !== 'owner');
+  const candidates = members.filter((m) => m.userId !== userId && m.role !== 'owner');
 
   return (
     <SettingsSection

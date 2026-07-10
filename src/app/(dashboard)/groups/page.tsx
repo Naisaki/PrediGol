@@ -3,7 +3,7 @@
 // Lista de grupos del usuario
 // =============================================================
 
-import { createClient } from '@/lib/supabase/server';
+import { auth } from '@clerk/nextjs/server';
 import { getUserGroups } from '@/server/services/group.service';
 import type { Metadata } from 'next';
 import { GroupsListClient } from '@/components/groups/groups-list-client';
@@ -11,14 +11,11 @@ import { GroupsListClient } from '@/components/groups/groups-list-client';
 export const metadata: Metadata = { title: 'Mis Grupos' };
 
 export default async function GroupsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { userId } = await auth();
 
-  if (!user) return null;
+  if (!userId) return null;
 
-  const groups = await getUserGroups(user.id);
+  const groups = await getUserGroups(userId);
 
   return (
     <GroupsListClient initialGroups={groups as any} />

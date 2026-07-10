@@ -17,7 +17,7 @@ import {
   LogOut 
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
-import { logoutAction } from '@/server/actions/auth';
+import { useClerk } from '@clerk/nextjs';
 
 const primaryNavItems = [
   { href: '/dashboard', labelKey: 'Inicio', icon: LayoutDashboard },
@@ -148,6 +148,7 @@ export function MobileNav() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [lang, setLang] = useState('ES');
+  const { signOut } = useClerk();
 
   // Cerrar el menú al cambiar de ruta
   useEffect(() => {
@@ -295,15 +296,14 @@ export function MobileNav() {
 
             {/* Logout button */}
             <div className="border-t border-[var(--border-subtle)] pt-5 mt-5">
-              <form action={logoutAction}>
-                <button
-                  type="submit"
-                  className="w-full flex items-center justify-center gap-2 p-3.5 rounded-xl border border-destructive/20 bg-destructive/5 text-destructive hover:bg-destructive/10 transition-colors text-sm font-semibold cursor-pointer"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span>{t('Cerrar sesión')}</span>
-                </button>
-              </form>
+              <button
+                type="button"
+                onClick={() => signOut({ redirectUrl: '/' })}
+                className="w-full flex items-center justify-center gap-2 p-3.5 rounded-xl border border-destructive/20 bg-destructive/5 text-destructive hover:bg-destructive/10 transition-colors text-sm font-semibold cursor-pointer"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>{t('Cerrar sesión')}</span>
+              </button>
             </div>
           </div>
         </div>

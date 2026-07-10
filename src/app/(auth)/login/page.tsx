@@ -3,7 +3,8 @@
 // app/(auth)/login/page.tsx
 // =============================================================
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -22,10 +23,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { loginAction } from '@/server/actions/auth';
+import { useSignIn, useClerk } from '@clerk/nextjs';
 
 const schema = z.object({
-  email: z.string().email('Email inválido'),
+  identifier: z.string().min(1, 'Email o usuario requerido'),
   password: z.string().min(1, 'Contraseña requerida'),
 });
 
@@ -35,7 +36,7 @@ const loginTranslations: Record<string, Record<string, string>> = {
   ES: {
     title: '¡Bienvenido de vuelta!',
     subtitle: 'Por favor inicia sesión para continuar',
-    emailLabel: 'Dirección de Email',
+    emailLabel: 'Email o Nombre de Usuario',
     passwordLabel: 'Contraseña',
     rememberMe: 'Recordarme',
     forgotPassword: '¿Olvidaste tu contraseña?',
@@ -50,7 +51,7 @@ const loginTranslations: Record<string, Record<string, string>> = {
   EN: {
     title: 'Welcome Back',
     subtitle: 'Please sign in to continue',
-    emailLabel: 'Email Address',
+    emailLabel: 'Email or Username',
     passwordLabel: 'Password',
     rememberMe: 'Remember me',
     forgotPassword: 'Forgot your password?',
@@ -105,7 +106,7 @@ const loginTranslations: Record<string, Record<string, string>> = {
     dividerText: 'または以下で続行',
     noAccount: 'アカンウトをお持ちではありませんか？',
     createAccount: '無料でアカウントを作成',
-    signingIn: 'サインイン中...',
+    signingIn: 'サインイン중...',
   },
   KO: {
     title: '다시 오신 것을 환영합니다',
@@ -124,10 +125,12 @@ const loginTranslations: Record<string, Record<string, string>> = {
   },
 };
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
   const [showPass, setShowPass] = useState(false);
   const [lang, setLang] = useState('ES');
+  const { signIn, errors: clerkErrors, fetchStatus } = useSignIn();
+  const clerk = useClerk();
 
   useEffect(() => {
     const saved = (localStorage.getItem('locale') || 'ES').toUpperCase();
@@ -152,63 +155,99 @@ export default function LoginPage() {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormData) => {
-    const result = await loginAction(data.email, data.password);
+    if (!signIn) return;
 
-    if (!result.success) {
-      toast.error(result.error ?? 'Error al iniciar sesión');
-      return;
+    try {
+      const { error } = await signIn.password({
+        identifier: data.identifier,
+        password: data.password,
+      });
+
+      if (error) {
+        toast.error(error.message ?? 'Error al iniciar sesión');
+        return;
+      }
+
+      if (signIn.status === 'complete') {
+        await signIn.finalize({
+          navigate: ({ session, decorateUrl }) => {
+            const url = decorateUrl('/dashboard');
+            if (url.startsWith('http')) {
+              window.location.href = url;
+            } else {
+              router.push(url);
+              router.refresh();
+            }
+          },
+        });
+        toast.success('¡Bienvenido de vuelta!');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Error al iniciar sesión');
     }
+  };
 
-    toast.success('¡Bienvenido de vuelta!');
-    router.push('/dashboard');
-    router.refresh();
+  const handleSocialLogin = async (strategy: 'oauth_google' | 'oauth_apple') => {
+    if (!signIn) return;
+    try {
+      const { error } = await signIn.sso({
+        strategy,
+        redirectUrl: '/dashboard',
+        redirectCallbackUrl: '/sso-callback',
+      });
+      if (error) {
+        toast.error('Error con inicio de sesión social: ' + error.message);
+      }
+    } catch (err: any) {
+      toast.error('Error con inicio de sesión social: ' + (err.message || String(err)));
+    }
   };
 
   return (
-    <Card className="glass-card border-border/40 shadow-2xl animate-scale-in p-6 sm:p-8 pb-10 sm:pb-12 rounded-[24px] overflow-hidden">
-      <CardHeader className="space-y-1 pb-6 pt-2">
+    <Card className="glass-card border-border/40 shadow-2xl animate-scale-in p-5 sm:p-6 pb-6 sm:pb-8 rounded-[20px]">
+      <CardHeader className="space-y-1 pb-4 pt-1">
         {/* Floating Door/Lock 3D design container */}
-        <div className="mx-auto h-12 w-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 text-primary shadow-sm shadow-primary/5">
-          <LogIn className="h-5 w-5" />
+        <div className="mx-auto h-10 w-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center mb-2 text-primary shadow-sm shadow-primary/5">
+          <LogIn className="h-4.5 w-4.5" />
         </div>
-        <CardTitle className="text-xl font-bold text-foreground text-center tracking-tight">{t('title')}</CardTitle>
+        <CardTitle className="text-lg font-bold text-foreground text-center tracking-tight">{t('title')}</CardTitle>
         <CardDescription className="text-xs text-muted-foreground text-center mt-1">
           {t('subtitle')}
         </CardDescription>
       </CardHeader>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-4 px-0">
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-xs font-semibold text-foreground/80">{t('emailLabel')}</Label>
+        <CardContent className="space-y-3 px-0">
+          <div className="space-y-1.5">
+            <Label htmlFor="identifier" className="text-xs font-semibold text-foreground/80">{t('emailLabel')}</Label>
             <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <Input
-                id="email"
-                type="email"
-                placeholder="tu@email.com"
-                autoComplete="email"
-                className="pl-10 bg-[var(--control-bg)] border-border/40 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 rounded-xl h-12 text-sm text-[var(--text)] transition-all"
-                {...register('email')}
+                id="identifier"
+                type="text"
+                placeholder="ej. usuario o tu@email.com"
+                autoComplete="username"
+                className="pl-9.5 bg-[var(--control-bg)] border-border/40 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 rounded-xl h-11 text-xs sm:text-sm text-[var(--text)] transition-all"
+                {...register('identifier')}
               />
             </div>
-            {errors.email && (
-              <p className="text-destructive text-xs">{errors.email.message}</p>
+            {errors.identifier && (
+              <p className="text-destructive text-xs">{errors.identifier.message}</p>
             )}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <Label htmlFor="password" className="text-xs font-semibold text-foreground/80">{t('passwordLabel')}</Label>
             </div>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <Input
                 id="password"
                 type={showPass ? 'text' : 'password'}
                 placeholder="••••••••"
                 autoComplete="current-password"
-                className="pl-10 pr-10 bg-[var(--control-bg)] border-border/40 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 rounded-xl h-12 text-sm text-[var(--text)] transition-all"
+                className="pl-9.5 pr-10 bg-[var(--control-bg)] border-border/40 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 rounded-xl h-11 text-xs sm:text-sm text-[var(--text)] transition-all"
                 {...register('password')}
               />
               <button
@@ -217,9 +256,9 @@ export default function LoginPage() {
                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
               >
                 {showPass ? (
-                  <EyeOff className="h-4 w-4" />
+                  <EyeOff className="h-3.5 w-3.5" />
                 ) : (
-                  <Eye className="h-4 w-4" />
+                  <Eye className="h-3.5 w-3.5" />
                 )}
               </button>
             </div>
@@ -231,7 +270,7 @@ export default function LoginPage() {
           </div>
 
           {/* Row of checkbox + forgot password */}
-          <div className="flex items-center justify-between pt-1">
+          <div className="flex items-center justify-between pt-0.5">
             <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none">
               <input 
                 type="checkbox" 
@@ -248,10 +287,10 @@ export default function LoginPage() {
           </div>
         </CardContent>
 
-        <CardFooter className="flex flex-col gap-4 pt-6 px-0 pb-6 sm:pb-8 border-none bg-transparent shadow-none">
+        <div className="flex flex-col gap-3 pt-4 px-0 pb-2">
           <Button
             type="submit"
-            className="w-full bg-[var(--text)] text-[var(--background)] hover:bg-[var(--text)]/90 font-bold h-12 rounded-full flex items-center justify-center gap-2 cursor-pointer shadow-md"
+            className="w-full bg-[var(--text)] text-[var(--background)] hover:bg-[var(--text)]/90 font-bold h-11 rounded-full flex items-center justify-center gap-2 cursor-pointer shadow-md text-xs sm:text-sm"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
@@ -268,7 +307,7 @@ export default function LoginPage() {
           </Button>
 
           {/* Social Logins Divider */}
-          <div className="relative flex items-center justify-center w-full my-2">
+          <div className="relative flex items-center justify-center w-full my-1">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-[var(--border-subtle)]"></div>
             </div>
@@ -282,7 +321,9 @@ export default function LoginPage() {
             <Button
               type="button"
               variant="outline"
-              className="rounded-xl border border-border/30 hover:bg-[var(--surface-hover)] bg-[var(--control-bg)] hover:text-[var(--text)] font-bold text-xs py-5 flex items-center justify-center gap-2 cursor-pointer transition-colors"
+              onClick={() => handleSocialLogin('oauth_google')}
+              disabled={!signIn || fetchStatus === 'fetching'}
+              className="rounded-xl border border-border/30 hover:bg-[var(--surface-hover)] bg-[var(--control-bg)] hover:text-[var(--text)] font-bold text-xs py-4 flex items-center justify-center gap-2 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -295,7 +336,9 @@ export default function LoginPage() {
             <Button
               type="button"
               variant="outline"
-              className="rounded-xl border border-border/30 hover:bg-[var(--surface-hover)] bg-[var(--control-bg)] hover:text-[var(--text)] font-bold text-xs py-5 flex items-center justify-center gap-2 cursor-pointer transition-colors"
+              onClick={() => handleSocialLogin('oauth_apple')}
+              disabled={!signIn || fetchStatus === 'fetching'}
+              className="rounded-xl border border-border/30 hover:bg-[var(--surface-hover)] bg-[var(--control-bg)] hover:text-[var(--text)] font-bold text-xs py-4 flex items-center justify-center gap-2 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg className="h-4 w-4 fill-current text-[var(--text)]" viewBox="0 0 24 24">
                 <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.75.79 0 1.9-.81 3.54-.64 1.7.17 2.97.88 3.69 2.04-3.37 2.02-2.52 6.55.77 7.89-.68 1.76-1.57 3.5-3.08 2.93zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.26 2.5-2.06 4.46-3.74 4.25z"/>
@@ -304,7 +347,7 @@ export default function LoginPage() {
             </Button>
           </div>
 
-          <p className="text-xs text-muted-foreground text-center mt-5">
+          <p className="text-xs text-muted-foreground text-center mt-3">
             {t('noAccount')}{' '}
             <Link
               href="/register"
@@ -313,9 +356,27 @@ export default function LoginPage() {
               {t('createAccount')}
             </Link>
           </p>
-        </CardFooter>
+          
+          {/* Contenedor Captcha invisible para requerimientos de Clerk */}
+          <div id="clerk-captcha" className="hidden" />
+        </div>
 
       </form>
     </Card>
+  );
+}
+
+export default function LoginPage() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  return (
+    <Suspense fallback={null}>
+      <LoginPageContent />
+    </Suspense>
   );
 }

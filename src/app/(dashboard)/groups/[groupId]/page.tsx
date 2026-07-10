@@ -3,7 +3,7 @@
 // Panel principal del grupo (overview, acciones, invite panel, miembros)
 // =============================================================
 
-import { createClient } from '@/lib/supabase/server';
+import { auth } from '@clerk/nextjs/server';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Users, Target, Trophy, Settings, ChevronRight } from 'lucide-react';
@@ -22,12 +22,9 @@ interface PageProps {
 
 export default async function GroupDetailPage({ params }: PageProps) {
   const { groupId } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { userId } = await auth();
 
-  if (!user) return null;
+  if (!userId) return null;
 
   // Obtener grupo
   const group = await getGroupById(groupId);
@@ -37,7 +34,7 @@ export default async function GroupDetailPage({ params }: PageProps) {
 
   // Obtener miembros
   const members = await getGroupMembers(groupId);
-  const currentMember = members.find((m) => m.userId === user.id);
+  const currentMember = members.find((m) => m.profile?.userId === userId || m.userId === userId);
 
   // Si el usuario no es miembro, redirigir a unirse por link
   if (!currentMember) {
@@ -112,11 +109,10 @@ export default async function GroupDetailPage({ params }: PageProps) {
             </Link>
           </div>
 
-          {/* Members List */}
           <MembersList
             groupId={groupId}
             members={members}
-            currentUserId={user.id}
+            currentUserId={userId}
             currentUserRole={currentUserRole}
           />
         </div>

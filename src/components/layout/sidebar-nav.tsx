@@ -17,7 +17,7 @@ import {
   User,
   LogOut,
 } from 'lucide-react';
-import { logoutAction } from '@/server/actions/auth';
+import { useClerk } from '@clerk/nextjs';
 import { cn } from '@/lib/utils/cn';
 import { useState, useEffect } from 'react';
 
@@ -155,6 +155,7 @@ const navSections = [
 export function SidebarNav({ username, avatarUrl, collapsed }: SidebarNavProps) {
   const pathname = usePathname();
   const [lang, setLang] = useState('ES');
+  const { signOut } = useClerk();
 
   useEffect(() => {
     const saved = localStorage.getItem('locale') || 'ES';
@@ -245,21 +246,20 @@ export function SidebarNav({ username, avatarUrl, collapsed }: SidebarNavProps) 
 
         {/* Footer Area */}
         <div className="pt-2 border-t border-[var(--border)] px-2 shrink-0">
-          <form action={logoutAction}>
-            <button
-              type="submit"
-              className={cn(
-                'inline-flex items-center gap-2 px-2.5 py-2.5 cursor-pointer select-none text-sm font-normal rounded-md transition-all duration-150 w-full text-start text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--errorColor)]',
-                collapsed ? 'justify-center' : ''
-              )}
-              title={collapsed ? t('Logout') : ''}
-            >
-              <span className="shrink-0 w-4.5 h-4.5 flex-shrink-0 flex items-center justify-center">
-                <LogOut className="h-4.5 w-4.5" />
-              </span>
-              {!collapsed && <span className="flex-1 truncate pl-1">{t('Logout')}</span>}
-            </button>
-          </form>
+          <button
+            type="button"
+            onClick={() => signOut({ redirectUrl: '/' })}
+            className={cn(
+              'inline-flex items-center gap-2 px-2.5 py-2.5 cursor-pointer select-none text-sm font-normal rounded-md transition-all duration-150 w-full text-start text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--errorColor)]',
+              collapsed ? 'justify-center' : ''
+            )}
+            title={collapsed ? t('Logout') : ''}
+          >
+            <span className="shrink-0 w-4.5 h-4.5 flex-shrink-0 flex items-center justify-center">
+              <LogOut className="h-4.5 w-4.5" />
+            </span>
+            {!collapsed && <span className="flex-1 truncate pl-1">{t('Logout')}</span>}
+          </button>
         </div>
       </div>
     </aside>

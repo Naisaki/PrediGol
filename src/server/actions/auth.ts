@@ -6,6 +6,7 @@
 
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { auth } from '@clerk/nextjs/server';
 import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
@@ -163,30 +164,78 @@ export async function forgotPasswordAction(
 }
 
 // ---- Actualizar perfil -------------------------------------
+export async function getMyProfileAction() {
+  const { userId } = await auth();
+  if (!userId) return null;
+
+  const serviceClient = createServiceClient();
+  const { data: profile } = await serviceClient
+    .from('profiles')
+    .select('username, full_name, avatar_url')
+    .eq('clerk_user_id', userId)
+    .maybeSingle();
+
+  return profile;
+}
 
 export async function updateProfileAction(
   username: string,
   fullName?: string,
   avatarUrl?: string,
 ): Promise<AuthActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { userId } = await auth();
 
-  if (!user) return { success: false, error: 'No autenticado' };
+  if (!userId) return { success: false, error: 'No autenticado' };
 
-  const { error } = await supabase
+  const serviceClient = createServiceClient();
+
+  const { error } = await serviceClient
     .from('profiles')
     .update({
       username: username.toLowerCase(),
       full_name: fullName ?? null,
       avatar_url: avatarUrl ?? null,
     })
-    .eq('user_id', user.id);
+    .eq('clerk_user_id', userId);
 
   if (error) return { success: false, error: error.message };
 
   revalidatePath('/profile');
+  return { success: true };
+}
+
+export async function syncClerkUserWithSupabase(
+  userId: string,
+  username: string,
+  fullName?: string,
+): Promise<AuthActionResult> {
+  const serviceClient = createServiceClient();
+  
+  // Verificar que el username no esté tomado
+  const { data: existingProfile } = await serviceClient
+    .from('profiles')
+    .select('id')
+    .eq('username', username.toLowerCase())
+    .single();
+
+  if (existingProfile) {
+    return {
+      success: false,
+      error: 'Ese username ya está en uso en Goleados. Por favor elige otro.',
+    };
+  }
+
+  const { error: profileError } = await serviceClient.from('profiles').insert({
+    clerk_user_id: userId,
+    user_id: userId,
+    username: username.toLowerCase(),
+    full_name: fullName ?? null,
+  });
+
+  if (profileError) {
+    return { success: false, error: `Error al crear perfil: ${profileError.message}` };
+  }
+
+  revalidatePath('/', 'layout');
   return { success: true };
 }

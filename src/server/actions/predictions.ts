@@ -5,7 +5,7 @@
 // =============================================================
 
 import { revalidatePath } from 'next/cache';
-import { createClient } from '@/lib/supabase/server';
+import { auth } from '@clerk/nextjs/server';
 import { getGroupMembers } from '@/server/services/group.service';
 import { upsertPrediction } from '@/server/services/prediction.service';
 import { z } from 'zod';
@@ -49,16 +49,13 @@ export async function savePredictionAction(
     return { success: false, error: validation.error.errors[0].message };
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { userId } = await auth();
 
-  if (!user) return { success: false, error: 'Debes iniciar sesión.' };
+  if (!userId) return { success: false, error: 'Debes iniciar sesión.' };
 
   // Verificar que el usuario sea miembro del grupo
   const members = await getGroupMembers(groupId);
-  const currentMember = members.find((m) => m.userId === user.id);
+  const currentMember = members.find((m) => m.userId === userId);
 
   if (!currentMember) {
     return {
@@ -68,7 +65,7 @@ export async function savePredictionAction(
   }
 
   try {
-    await upsertPrediction(user.id, matchId, groupId, homeScore, awayScore);
+    await upsertPrediction(userId, matchId, groupId, homeScore, awayScore);
     revalidatePath(`/groups/${groupId}/predictions`);
     return { success: true };
   } catch (err) {

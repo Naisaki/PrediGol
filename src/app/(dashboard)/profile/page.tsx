@@ -12,8 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { createClient } from '@/lib/supabase/client';
-import { updateProfileAction } from '@/server/actions/auth';
+import { useUser } from '@clerk/nextjs';
+import { updateProfileAction, getMyProfileAction } from '@/server/actions/auth';
 
 const profileTranslations: Record<string, Record<string, string>> = {
   ES: {
@@ -134,7 +134,7 @@ const profileTranslations: Record<string, Record<string, string>> = {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const supabase = createClient();
+  const { user, isLoaded } = useUser();
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [fullName, setFullName] = useState('');
@@ -159,22 +159,17 @@ export default function ProfilePage() {
   };
 
   useEffect(() => {
+    if (!isLoaded) return;
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
+    setEmail(user.primaryEmailAddress?.emailAddress ?? '');
+
     async function loadProfile() {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          router.push('/login');
-          return;
-        }
-
-        setEmail(user.email ?? '');
-
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('username, full_name, avatar_url')
-          .eq('user_id', user.id)
-          .single();
-
+        const profile = await getMyProfileAction();
         if (profile) {
           setUsername(profile.username);
           setFullName(profile.full_name ?? '');
@@ -189,7 +184,7 @@ export default function ProfilePage() {
     }
 
     loadProfile();
-  }, [router, supabase, lang]);
+  }, [router, user, isLoaded, lang]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

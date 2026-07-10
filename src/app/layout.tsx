@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { DM_Sans } from 'next/font/google';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/common/theme-provider';
+import { ClerkProvider } from '@clerk/nextjs';
 import './globals.css';
 
 const dmSans = DM_Sans({
@@ -36,10 +37,12 @@ export default function RootLayout({
       <body
         className={`${dmSans.variable} font-sans antialiased bg-background text-foreground min-h-screen`}
       >
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          {children}
-          <Toaster position="top-right" />
-        </ThemeProvider>
+        <ClerkProvider>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+            {children}
+            <Toaster position="top-right" />
+          </ThemeProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

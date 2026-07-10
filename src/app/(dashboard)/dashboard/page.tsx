@@ -3,6 +3,7 @@
 // Dashboard principal
 // =============================================================
 
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import { ApiDelayNotice } from '@/components/common/api-delay-notice';
 import { getUserGroups } from '@/server/services/group.service';
@@ -13,12 +14,11 @@ import { WelcomeHeader } from '@/components/dashboard/welcome-header';
 export const metadata: Metadata = { title: 'Dashboard' };
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { userId } = await auth();
 
-  if (!user) return null;
+  if (!userId) return null;
+
+  const supabase = await createClient();
 
   // Obtener ventana de partidos (ayer, hoy, mañana) para filtrar en el cliente según su zona horaria
   const today = new Date();
@@ -35,9 +35,9 @@ export default async function DashboardPage() {
     supabase
       .from('profiles')
       .select('username, full_name')
-      .eq('user_id', user.id)
+      .eq('clerk_user_id', userId)
       .maybeSingle(),
-    getUserGroups(user.id),
+    getUserGroups(userId),
     supabase
       .from('matches')
       .select('id, home_team_name, away_team_name, home_team_crest, away_team_crest, kickoff_time, status, home_score, away_score')

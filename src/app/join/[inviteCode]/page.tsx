@@ -3,7 +3,8 @@
 // Página de unirse a un grupo por código/enlace/QR
 // =============================================================
 
-import { createClient } from '@/lib/supabase/server';
+import { auth } from '@clerk/nextjs/server';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { getGroupByInviteCode } from '@/server/services/group.service';
 import { JoinGroupClient } from '@/components/groups/join-group-client';
 import { Trophy, Users } from 'lucide-react';
@@ -18,24 +19,27 @@ interface PageProps {
 
 export default async function JoinPage({ params }: PageProps) {
   const { inviteCode } = await params;
-  const supabase = await createClient();
+  const { userId } = await auth();
 
   // Obtener información del grupo antes de login
   const group = await getGroupByInviteCode(inviteCode.toUpperCase());
 
-  // Verificar si hay usuario autenticado
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   // Si el usuario ya es miembro, redirigir directamente
-  if (user && group) {
-    const { data: membership } = await supabase
-      .from('group_members')
-      .select('id')
-      .eq('group_id', group.id)
-      .eq('user_id', user.id)
-      .single();
+  if (userId && group) {
+    const serviceClient = createServiceClient();
+    const { data: profile } = await serviceClient
+      .from('profiles')
+      .select('user_id')
+      .eq('clerk_user_id', userId)
+      .maybeSingle();
+
+    if (profile) {
+      const { data: membership } = await serviceClient
+        .from('group_members')
+        .select('id')
+        .eq('group_id', group.id)
+        .eq('user_id', profile.user_id)
+        .maybeSingle();
 
     if (membership) {
       // Ya es miembro — mostrar mensaje
@@ -59,6 +63,7 @@ export default async function JoinPage({ params }: PageProps) {
         </div>
       );
     }
+   }
   }
 
   return (
@@ -79,7 +84,7 @@ export default async function JoinPage({ params }: PageProps) {
         <JoinGroupClient
           group={group}
           inviteCode={inviteCode.toUpperCase()}
-          isAuthenticated={!!user}
+          isAuthenticated={!!userId}
         />
       </div>
     </div>

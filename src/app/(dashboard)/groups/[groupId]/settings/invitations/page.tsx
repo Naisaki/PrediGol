@@ -3,7 +3,7 @@
 // Sección: Configuración de Invitaciones
 // =============================================================
 
-import { createClient } from '@/lib/supabase/server';
+import { auth } from '@clerk/nextjs/server';
 import { getGroupById } from '@/server/services/group.service';
 import { SettingsSection } from '@/components/groups/settings/settings-section';
 import { InvitationsForm } from '@/components/groups/settings/invitations-form';
@@ -14,9 +14,8 @@ interface PageProps {
 
 export default async function InvitationsSettingsPage({ params }: PageProps) {
   const { groupId } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
+  const { userId } = await auth();
+  if (!userId) return null;
 
   const group = await getGroupById(groupId);
   if (!group) return null;

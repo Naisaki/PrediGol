@@ -4,24 +4,33 @@
 // =============================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { auth } from '@clerk/nextjs/server';
+import { createServiceClient } from '@/lib/supabase/server';
 import { updateMatchManually } from '@/server/services/match.service';
 import { recalculatePointsForMatch } from '@/server/services/prediction.service';
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { userId } = await auth();
 
-  if (!user) {
+  if (!userId) {
     return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
   }
 
-  const { data: roleData } = await supabase
+  const serviceClient = createServiceClient();
+  const { data: profile } = await serviceClient
+    .from('profiles')
+    .select('user_id')
+    .eq('clerk_user_id', userId)
+    .maybeSingle();
+
+  if (!profile) {
+    return NextResponse.json({ error: 'Acceso denegado' }, { status: 403 });
+  }
+
+  const { data: roleData } = await serviceClient
     .from('user_roles')
     .select('role')
-    .eq('user_id', user.id)
+    .eq('user_id', profile.user_id)
     .single();
 
   if (roleData?.role !== 'platform_admin') {
@@ -43,7 +52,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    await updateMatchManually(matchId, homeScore, awayScore, status, user.id, reason);
+    await updateMatchManually(matchId, homeScore, awayScore, status, userId, reason);
 
     // Si el partido está finalizado, recalcular puntos
     let predictionsUpdated = 0;

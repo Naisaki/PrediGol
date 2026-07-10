@@ -6,7 +6,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { auth } from '@clerk/nextjs/server';
 import {
   createGroup,
   joinGroupByCode,
@@ -47,15 +47,12 @@ export async function createGroupAction(
     return { success: false, error: validation.error.errors[0].message };
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { userId } = await auth();
 
-  if (!user) return { success: false, error: 'Debes iniciar sesión.' };
+  if (!userId) return { success: false, error: 'Debes iniciar sesión.' };
 
   try {
-    const group = await createGroup(name, description ?? null, user.id);
+    const group = await createGroup(name, description ?? null, userId);
     revalidatePath('/groups');
     return { success: true, data: { groupId: group.id } };
   } catch (err) {
@@ -75,15 +72,12 @@ export async function joinGroupAction(
     return { success: false, error: 'Código de invitación inválido' };
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { userId } = await auth();
 
-  if (!user) return { success: false, error: 'Debes iniciar sesión.' };
+  if (!userId) return { success: false, error: 'Debes iniciar sesión.' };
 
   try {
-    const group = await joinGroupByCode(inviteCode.toUpperCase(), user.id);
+    const group = await joinGroupByCode(inviteCode.toUpperCase(), userId);
     revalidatePath('/groups');
     return { success: true, data: { groupId: group.id } };
   } catch (err) {
@@ -99,15 +93,12 @@ export async function joinGroupAction(
 export async function regenerateInviteCodeAction(
   groupId: string,
 ): Promise<GroupActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { userId } = await auth();
 
-  if (!user) return { success: false, error: 'No autenticado' };
+  if (!userId) return { success: false, error: 'No autenticado' };
 
   try {
-    const newCode = await regenerateInviteCode(groupId, user.id);
+    const newCode = await regenerateInviteCode(groupId, userId);
     revalidatePath(`/groups/${groupId}`);
     return { success: true, data: { inviteCode: newCode } };
   } catch (err) {
@@ -124,15 +115,12 @@ export async function removeMemberAction(
   groupId: string,
   targetUserId: string,
 ): Promise<GroupActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { userId } = await auth();
 
-  if (!user) return { success: false, error: 'No autenticado' };
+  if (!userId) return { success: false, error: 'No autenticado' };
 
   try {
-    await removeMember(groupId, targetUserId, user.id);
+    await removeMember(groupId, targetUserId, userId);
     revalidatePath(`/groups/${groupId}`);
     revalidatePath(`/groups/${groupId}/settings/participants`);
     return { success: true };
@@ -158,12 +146,11 @@ export async function updateGroupInfoAction(
   }).safeParse({ name, description });
   if (!validation.success) return { success: false, error: validation.error.errors[0].message };
 
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: 'No autenticado' };
+  const { userId } = await auth();
+  if (!userId) return { success: false, error: 'No autenticado' };
 
   try {
-    await updateGroupInfo(groupId, user.id, { name, description, imageUrl });
+    await updateGroupInfo(groupId, userId, { name, description, imageUrl });
     revalidatePath(`/groups/${groupId}`);
     revalidatePath(`/groups/${groupId}/settings/general`);
     return { success: true };
@@ -178,12 +165,11 @@ export async function updateGroupSettingsAction(
   groupId: string,
   settings: { welcomeMessage: string | null; joinsOpen: boolean; joinApproval: boolean; maxMembers: number | null },
 ): Promise<GroupActionResult> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: 'No autenticado' };
+  const { userId } = await auth();
+  if (!userId) return { success: false, error: 'No autenticado' };
 
   try {
-    await updateGroupSettings(groupId, user.id, settings);
+    await updateGroupSettings(groupId, userId, settings);
     revalidatePath(`/groups/${groupId}/settings/invitations`);
     return { success: true };
   } catch (err) {
@@ -206,12 +192,11 @@ export async function updateScoringRulesAction(
   }).safeParse({ exactScore, correctResult, goalDiff });
   if (!validation.success) return { success: false, error: validation.error.errors[0].message };
 
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: 'No autenticado' };
+  const { userId } = await auth();
+  if (!userId) return { success: false, error: 'No autenticado' };
 
   try {
-    await updateScoringRules(groupId, user.id, { exactScore, correctResult, goalDiff });
+    await updateScoringRules(groupId, userId, { exactScore, correctResult, goalDiff });
     revalidatePath(`/groups/${groupId}/settings/scoring`);
     return { success: true };
   } catch (err) {
@@ -226,12 +211,11 @@ export async function updateMemberRoleAction(
   targetUserId: string,
   newRole: 'admin' | 'member',
 ): Promise<GroupActionResult> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: 'No autenticado' };
+  const { userId } = await auth();
+  if (!userId) return { success: false, error: 'No autenticado' };
 
   try {
-    await updateMemberRole(groupId, user.id, targetUserId, newRole);
+    await updateMemberRole(groupId, userId, targetUserId, newRole);
     revalidatePath(`/groups/${groupId}/settings/participants`);
     return { success: true };
   } catch (err) {
@@ -245,12 +229,11 @@ export async function transferOwnershipAction(
   groupId: string,
   newOwnerId: string,
 ): Promise<GroupActionResult> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: 'No autenticado' };
+  const { userId } = await auth();
+  if (!userId) return { success: false, error: 'No autenticado' };
 
   try {
-    await transferOwnership(groupId, user.id, newOwnerId);
+    await transferOwnership(groupId, userId, newOwnerId);
     revalidatePath(`/groups/${groupId}`);
     revalidatePath(`/groups/${groupId}/settings`);
     return { success: true };
@@ -264,12 +247,11 @@ export async function transferOwnershipAction(
 export async function closeGroupAction(
   groupId: string,
 ): Promise<GroupActionResult> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: 'No autenticado' };
+  const { userId } = await auth();
+  if (!userId) return { success: false, error: 'No autenticado' };
 
   try {
-    await closeGroup(groupId, user.id);
+    await closeGroup(groupId, userId);
     revalidatePath(`/groups`);
     revalidatePath(`/groups/${groupId}`);
     return { success: true };
@@ -283,12 +265,11 @@ export async function closeGroupAction(
 export async function deleteGroupAction(
   groupId: string,
 ): Promise<GroupActionResult> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: 'No autenticado' };
+  const { userId } = await auth();
+  if (!userId) return { success: false, error: 'No autenticado' };
 
   try {
-    await deleteGroup(groupId, user.id);
+    await deleteGroup(groupId, userId);
     revalidatePath(`/groups`);
     return { success: true };
   } catch (err) {

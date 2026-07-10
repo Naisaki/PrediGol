@@ -10,6 +10,23 @@ import {
   generateQRCodeDataURL,
 } from '@/lib/qr/generator';
 import type { Group, GroupMember } from '@/types/app.types';
+// ---- Helper interno: resolver Clerk User ID a Profile UUID -----------------
+
+async function resolveClerkIdToUuid(
+  supabase: ReturnType<typeof createServiceClient>,
+  clerkUserId: string,
+): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('user_id')
+    .eq('clerk_user_id', clerkUserId)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+  return data.user_id;
+}
 
 // ---- Creación y gestión de grupos --------------------------
 
@@ -19,6 +36,8 @@ export async function createGroup(
   ownerId: string,
 ): Promise<Group> {
   const supabase = createServiceClient();
+  const ownerUuid = await resolveClerkIdToUuid(supabase, ownerId);
+  if (!ownerUuid) throw new Error('Perfil del usuario no encontrado.');
 
   // Generar código único (reintentar si hay colisión)
   let inviteCode = generateInviteCode();
@@ -44,7 +63,7 @@ export async function createGroup(
     .insert({
       name,
       description,
-      owner_id: ownerId,
+      owner_id: ownerUuid,
       invite_code: inviteCode,
       invite_url: inviteUrl,
       qr_code_url: qrCodeUrl,
@@ -57,7 +76,7 @@ export async function createGroup(
   // Agregar al owner como miembro con rol 'owner'
   const { error: memberError } = await supabase.from('group_members').insert({
     group_id: data.id,
-    user_id: ownerId,
+    user_id: ownerUuid,
     role: 'owner',
   });
 
@@ -97,6 +116,9 @@ export async function getGroupByInviteCode(
 
 export async function getUserGroups(userId: string): Promise<Group[]> {
   const supabase = createServiceClient();
+  const userUuid = await resolveClerkIdToUuid(supabase, userId);
+  if (!userUuid) return [];
+
   const { data, error } = await supabase
     .from('group_members')
     .select(`
@@ -107,7 +129,7 @@ export async function getUserGroups(userId: string): Promise<Group[]> {
         members:group_members(count)
       )
     `)
-    .eq('user_id', userId)
+    .eq('user_id', userUuid)
     .order('joined_at', { ascending: false });
 
   if (error) throw new Error(`getUserGroups: ${error.message}`);
@@ -139,11 +161,11 @@ export async function getGroupMembers(groupId: string): Promise<GroupMember[]> {
   const { data: profiles, error: profilesError } = await supabase
     .from('profiles')
     .select('id, user_id, username, full_name, avatar_url')
-    .in('user_id', userIds);
+    .in('id', userIds);
 
   if (profilesError) throw new Error(`getGroupMembers profiles: ${profilesError.message}`);
 
-  const profilesMap = new Map(profiles?.map((p) => [p.user_id, p]) ?? []);
+  const profilesMap = new Map(profiles?.map((p) => [p.id, p]) ?? []);
 
   return members.map((m) => {
     const profile = profilesMap.get(m.user_id);
@@ -164,14 +186,16 @@ export async function joinGroupByCode(
   if (!group) throw new Error('Código de invitación inválido o grupo inactivo.');
 
   const supabase = createServiceClient();
+  const userUuid = await resolveClerkIdToUuid(supabase, userId);
+  if (!userUuid) throw new Error('Perfil del usuario no encontrado.');
 
   // Verificar si ya es miembro
   const { data: existing } = await supabase
     .from('group_members')
     .select('id')
     .eq('group_id', group.id)
-    .eq('user_id', userId)
-    .single();
+    .eq('user_id', userUuid)
+    .maybeSingle();
 
   if (existing) {
     throw new Error('Ya eres miembro de este grupo.');
@@ -179,7 +203,7 @@ export async function joinGroupByCode(
 
   const { error } = await supabase.from('group_members').insert({
     group_id: group.id,
-    user_id: userId,
+    user_id: userUuid,
     role: 'member',
   });
 
@@ -194,18 +218,11 @@ export async function regenerateInviteCode(
   requestingUserId: string,
 ): Promise<string> {
   const supabase = createServiceClient();
+  const requestingUuid = await resolveClerkIdToUuid(supabase, requestingUserId);
+  if (!requestingUuid) throw new Error('Perfil del usuario no encontrado.');
 
   // Verificar que sea owner
-  const { data: member } = await supabase
-    .from('group_members')
-    .select('role')
-    .eq('group_id', groupId)
-    .eq('user_id', requestingUserId)
-    .single();
-
-  if (!member || member.role !== 'owner') {
-    throw new Error('Solo el owner puede regenerar el código de invitación.');
-  }
+  await assertOwner(supabase, groupId, requestingUuid);
 
   const newCode = generateInviteCode();
   const newUrl = buildInviteUrl(newCode);
@@ -232,12 +249,15 @@ export async function removeMember(
   requestingUserId: string,
 ): Promise<void> {
   const supabase = createServiceClient();
+  const requestingUuid = await resolveClerkIdToUuid(supabase, requestingUserId);
+  const targetUuid = await resolveClerkIdToUuid(supabase, targetUserId);
+  if (!requestingUuid || !targetUuid) throw new Error('Perfil del usuario no encontrado.');
 
   const { data: requestingMember } = await supabase
     .from('group_members')
     .select('role')
     .eq('group_id', groupId)
-    .eq('user_id', requestingUserId)
+    .eq('user_id', requestingUuid)
     .single();
 
   if (
@@ -252,7 +272,7 @@ export async function removeMember(
     .from('group_members')
     .select('role')
     .eq('group_id', groupId)
-    .eq('user_id', targetUserId)
+    .eq('user_id', targetUuid)
     .single();
 
   if (targetMember?.role === 'owner') {
@@ -263,7 +283,7 @@ export async function removeMember(
     .from('group_members')
     .delete()
     .eq('group_id', groupId)
-    .eq('user_id', targetUserId);
+    .eq('user_id', targetUuid);
 
   if (error) throw new Error(`removeMember: ${error.message}`);
 }
@@ -284,12 +304,12 @@ export async function getGroupRanking(groupId: string) {
   const userIds = members.map((m) => m.user_id);
   const { data: profiles, error: profilesError } = await supabase
     .from('profiles')
-    .select('user_id, username, full_name, avatar_url')
-    .in('user_id', userIds);
+    .select('id, user_id, username, full_name, avatar_url')
+    .in('id', userIds);
 
   if (profilesError) throw new Error(`getGroupRanking profiles: ${profilesError.message}`);
 
-  const profilesMap = new Map(profiles?.map((p) => [p.user_id, p]) ?? []);
+  const profilesMap = new Map(profiles?.map((p) => [p.id, p]) ?? []);
 
   const ranking = await Promise.all(
     members.map(async (member) => {
@@ -318,7 +338,7 @@ export async function getGroupRanking(groupId: string) {
       const profile = profilesMap.get(member.user_id);
 
       return {
-        userId: member.user_id,
+        userId: profile?.user_id ?? member.user_id,
         username: profile?.username ?? 'Usuario',
         fullName: profile?.full_name ?? null,
         avatarUrl: profile?.avatar_url ?? null,
@@ -333,19 +353,18 @@ export async function getGroupRanking(groupId: string) {
     }),
   );
 
-  // Ordenar por reglas de desempate
   return ranking.sort((a, b) => {
-    if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
-    if (b.exactScores !== a.exactScores) return b.exactScores - a.exactScores;
-    if (b.correctResults !== a.correctResults)
-      return b.correctResults - a.correctResults;
-    if (b.goalDifferenceHits !== a.goalDifferenceHits)
-      return b.goalDifferenceHits - a.goalDifferenceHits;
-    if (b.predictionsCount !== a.predictionsCount)
-      return b.predictionsCount - a.predictionsCount;
-    return new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime();
-  }).map((entry, index) => ({ ...entry, position: index + 1 }));
+    if (b.totalPoints !== a.totalPoints) {
+      return b.totalPoints - a.totalPoints;
+    }
+    if (b.exactScores !== a.exactScores) {
+      return b.exactScores - a.exactScores;
+    }
+    return a.joinedAt.localeCompare(b.joinedAt);
+  });
 }
+
+// ---- Mapper helpers ----------------------------------------
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapGroupRow(row: any): Group {
@@ -399,7 +418,9 @@ export async function updateGroupInfo(
   data: { name: string; description: string | null; imageUrl: string | null },
 ): Promise<void> {
   const supabase = createServiceClient();
-  await assertOwner(supabase, groupId, requestingUserId);
+  const requestingUuid = await resolveClerkIdToUuid(supabase, requestingUserId);
+  if (!requestingUuid) throw new Error('Perfil del usuario no encontrado.');
+  await assertOwner(supabase, groupId, requestingUuid);
   const { error } = await supabase
     .from('groups')
     .update({ name: data.name, description: data.description, image_url: data.imageUrl, updated_at: new Date().toISOString() })
@@ -413,7 +434,9 @@ export async function updateGroupSettings(
   data: { welcomeMessage: string | null; joinsOpen: boolean; joinApproval: boolean; maxMembers: number | null },
 ): Promise<void> {
   const supabase = createServiceClient();
-  await assertOwner(supabase, groupId, requestingUserId);
+  const requestingUuid = await resolveClerkIdToUuid(supabase, requestingUserId);
+  if (!requestingUuid) throw new Error('Perfil del usuario no encontrado.');
+  await assertOwner(supabase, groupId, requestingUuid);
   const { error } = await supabase
     .from('groups')
     .update({
@@ -433,7 +456,9 @@ export async function updateScoringRules(
   data: { exactScore: number; correctResult: number; goalDiff: number },
 ): Promise<void> {
   const supabase = createServiceClient();
-  await assertOwner(supabase, groupId, requestingUserId);
+  const requestingUuid = await resolveClerkIdToUuid(supabase, requestingUserId);
+  if (!requestingUuid) throw new Error('Perfil del usuario no encontrado.');
+  await assertOwner(supabase, groupId, requestingUuid);
   const { error } = await supabase
     .from('groups')
     .update({
@@ -453,13 +478,17 @@ export async function updateMemberRole(
   newRole: 'admin' | 'member',
 ): Promise<void> {
   const supabase = createServiceClient();
-  await assertOwner(supabase, groupId, requestingUserId);
-  if (targetUserId === requestingUserId) throw new Error('No puedes cambiar tu propio rol.');
+  const requestingUuid = await resolveClerkIdToUuid(supabase, requestingUserId);
+  const targetUuid = await resolveClerkIdToUuid(supabase, targetUserId);
+  if (!requestingUuid || !targetUuid) throw new Error('Perfil del usuario no encontrado.');
+
+  await assertOwner(supabase, groupId, requestingUuid);
+  if (targetUuid === requestingUuid) throw new Error('No puedes cambiar tu propio rol.');
   const { error } = await supabase
     .from('group_members')
     .update({ role: newRole })
     .eq('group_id', groupId)
-    .eq('user_id', targetUserId)
+    .eq('user_id', targetUuid)
     .neq('role', 'owner');
   if (error) throw new Error(`updateMemberRole: ${error.message}`);
 }
@@ -470,24 +499,28 @@ export async function transferOwnership(
   newOwnerId: string,
 ): Promise<void> {
   const supabase = createServiceClient();
-  await assertOwner(supabase, groupId, currentOwnerId);
-  if (newOwnerId === currentOwnerId) throw new Error('Ya eres el owner del grupo.');
+  const currentOwnerUuid = await resolveClerkIdToUuid(supabase, currentOwnerId);
+  const newOwnerUuid = await resolveClerkIdToUuid(supabase, newOwnerId);
+  if (!currentOwnerUuid || !newOwnerUuid) throw new Error('Perfil del usuario no encontrado.');
+
+  await assertOwner(supabase, groupId, currentOwnerUuid);
+  if (newOwnerUuid === currentOwnerUuid) throw new Error('Ya eres el owner del grupo.');
 
   // Verificar que el nuevo owner es miembro
   const { data: targetMember } = await supabase
     .from('group_members')
     .select('id')
     .eq('group_id', groupId)
-    .eq('user_id', newOwnerId)
+    .eq('user_id', newOwnerUuid)
     .single();
   if (!targetMember) throw new Error('El nuevo owner debe ser miembro del grupo.');
 
   // Transferencia atómica: nuevo owner + degradar anterior a admin
   const [r1, r2, r3] = await Promise.all([
-    supabase.from('group_members').update({ role: 'owner' }).eq('group_id', groupId).eq('user_id', newOwnerId),
-    supabase.from('group_members').update({ role: 'admin' }).eq('group_id', groupId).eq('user_id', currentOwnerId),
+    supabase.from('group_members').update({ role: 'owner' }).eq('group_id', groupId).eq('user_id', newOwnerUuid),
+    supabase.from('group_members').update({ role: 'admin' }).eq('group_id', groupId).eq('user_id', currentOwnerUuid),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    supabase.from('groups').update({ owner_id: newOwnerId, updated_at: new Date().toISOString() } as any).eq('id', groupId),
+    supabase.from('groups').update({ owner_id: newOwnerUuid, updated_at: new Date().toISOString() } as any).eq('id', groupId),
   ]);
   if (r1.error) throw new Error(`transferOwnership (new): ${r1.error.message}`);
   if (r2.error) throw new Error(`transferOwnership (old): ${r2.error.message}`);
@@ -499,7 +532,9 @@ export async function closeGroup(
   requestingUserId: string,
 ): Promise<void> {
   const supabase = createServiceClient();
-  await assertOwner(supabase, groupId, requestingUserId);
+  const requestingUuid = await resolveClerkIdToUuid(supabase, requestingUserId);
+  if (!requestingUuid) throw new Error('Perfil del usuario no encontrado.');
+  await assertOwner(supabase, groupId, requestingUuid);
   const { error } = await supabase
     .from('groups')
     .update({ is_active: false, updated_at: new Date().toISOString() })
@@ -512,7 +547,9 @@ export async function deleteGroup(
   requestingUserId: string,
 ): Promise<void> {
   const supabase = createServiceClient();
-  await assertOwner(supabase, groupId, requestingUserId);
+  const requestingUuid = await resolveClerkIdToUuid(supabase, requestingUserId);
+  if (!requestingUuid) throw new Error('Perfil del usuario no encontrado.');
+  await assertOwner(supabase, groupId, requestingUuid);
   const { error } = await supabase.from('groups').delete().eq('id', groupId);
   if (error) throw new Error(`deleteGroup: ${error.message}`);
 }
@@ -537,16 +574,16 @@ export async function getGroupStats(groupId: string): Promise<import('@/types/ap
   const userIds = membersList.map((m) => m.user_id);
   const { data: profiles } = await supabase
     .from('profiles')
-    .select('user_id, username, avatar_url')
-    .in('user_id', userIds);
-  const profilesMap = new Map(profiles?.map((p) => [p.user_id, p]) ?? []);
+    .select('id, user_id, username, avatar_url')
+    .in('id', userIds);
+  const profilesMap = new Map(profiles?.map((p) => [p.id, p]) ?? []);
 
   // Stats por miembro
   const memberStats = membersList.map((m) => {
     const count = predsList.filter((p) => p.user_id === m.user_id).length;
     const profile = profilesMap.get(m.user_id);
     return {
-      userId: m.user_id,
+      userId: profile?.user_id ?? m.user_id,
       username: profile?.username ?? 'Usuario',
       avatarUrl: profile?.avatar_url ?? null,
       predictionsCount: count,
@@ -576,12 +613,12 @@ export async function getGroupStats(groupId: string): Promise<import('@/types/ap
 
 // ---- Helper interno: verificar que el usuario es owner -----
 
-async function assertOwner(supabase: ReturnType<typeof createServiceClient>, groupId: string, userId: string) {
+async function assertOwner(supabase: ReturnType<typeof createServiceClient>, groupId: string, userUuid: string) {
   const { data: member } = await supabase
     .from('group_members')
     .select('role')
     .eq('group_id', groupId)
-    .eq('user_id', userId)
+    .eq('user_id', userUuid)
     .single();
   if (!member || member.role !== 'owner') {
     throw new Error('Solo el owner del grupo puede realizar esta acción.');

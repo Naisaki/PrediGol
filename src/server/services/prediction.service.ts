@@ -165,12 +165,30 @@ export async function recalculateAllFinishedMatches(): Promise<{
   return { matchesProcessed: finishedMatches.length, predictionsUpdated };
 }
 
+// ---- Helper interno: resolver Clerk User ID a Profile UUID -----------------
+
+async function resolveClerkIdToUuid(clerkUserId: string): Promise<string | null> {
+  const { data, error } = await supabase()
+    .from('profiles')
+    .select('user_id')
+    .eq('clerk_user_id', clerkUserId)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+  return data.user_id;
+}
+
 // ---- Consultas de pronósticos ------------------------------
 
 export async function getUserPredictionsForGroup(
   userId: string,
   groupId: string,
 ) {
+  const userUuid = await resolveClerkIdToUuid(userId);
+  if (!userUuid) return [];
+
   const { data, error } = await supabase()
     .from('predictions')
     .select(`
@@ -181,7 +199,7 @@ export async function getUserPredictionsForGroup(
         home_score, away_score, winner
       )
     `)
-    .eq('user_id', userId)
+    .eq('user_id', userUuid)
     .eq('group_id', groupId)
     .order('created_at', { ascending: false });
 
@@ -216,6 +234,8 @@ export async function upsertPrediction(
   awayScore: number,
 ): Promise<void> {
   const sb = supabase();
+  const userUuid = await resolveClerkIdToUuid(userId);
+  if (!userUuid) throw new Error('Perfil del usuario no encontrado.');
 
   // Verificar que el partido no haya empezado
   const { data: match } = await sb
@@ -237,7 +257,7 @@ export async function upsertPrediction(
     .from('predictions')
     .upsert(
       {
-        user_id: userId,
+        user_id: userUuid,
         match_id: matchId,
         group_id: groupId,
         predicted_home_score: homeScore,
@@ -249,3 +269,4 @@ export async function upsertPrediction(
 
   if (error) throw new Error(`upsertPrediction: ${error.message}`);
 }
+
